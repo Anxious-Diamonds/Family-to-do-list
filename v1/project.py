@@ -1,3 +1,7 @@
+"""A family to-do list"""
+import tkinter
+import os
+
 class GUI:
     def __init__(self):
         pass
@@ -17,4 +21,16 @@ class Tasks:
 class File:
     def __init__(self):
         pass
+    def write(self, tasks, user):
+        """writes tasks to the to-do list"""
 
+class User:
+    def __init__(self, username):
+        self.user_name = username
+        try:
+            with open(self.user_name +".txt") as f:
+                
+
+def main():
+    """The main project loop"""
+    
