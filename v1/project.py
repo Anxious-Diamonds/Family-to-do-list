@@ -16,7 +16,10 @@ class Task:
 
 class Tasks:
     def __init__(self, tasks):
-        self.tasks = []
+        if len(tasks) > 0:
+            self.tasks = tasks
+        else:
+            self.tasks = []
         for i in range(len(tasks)):
             self.tasks.append(Task(tasks[i]))
 
@@ -25,6 +28,9 @@ class Tasks:
     
     def return_tasks(self):
         return self.tasks
+    
+    def add_task(self, task):
+        self.tasks.append(Task(task))
 
 class File:
     def __init__(self, file):
@@ -67,12 +73,18 @@ class User:
             self.user_file.write(self.tasks)
         else:
             print('User has no tasks to write!')
+    
+    def new_task(self, task):
+        """makes a new task"""
+        self.tasks.add_task(task)
   
 
 def main():
     """The main project loop"""
     kid1 = User('kid1')
     kid1.read()
+    task = input('whats ur task: ')
+    kid1.new_task(task)
     kid1.write()
 
 main()
