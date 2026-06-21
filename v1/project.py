@@ -16,21 +16,32 @@ class Task:
 
 class Tasks:
     def __init__(self, tasks):
-        if len(tasks) > 0:
-            self.tasks = tasks
-        else:
+        if isinstance(tasks, list):
             self.tasks = []
-        for i in range(len(tasks)):
-            self.tasks.append(Task(tasks[i]))
+            for i in range(len(tasks)):
+                self.tasks.append(Task(tasks[i]))
+        else:
+            if len(tasks) > 0:
+                self.tasks = [Task('No tasks found')]
+            else:
+                self.tasks = [Task(tasks)]
 
     def __str__(self):
         return(f"Tasks: {self.tasks}")
     
-    def return_tasks(self):
+    def __len__(self):
+        return(len(self.tasks))
+    
+    def __add__(self, new_task):
+        if isinstance(new_task, list):
+            for i in range(len(new_task)):
+                self.tasks.append(Task(new_task[i]))
+        else:
+            self.tasks.append(Tasks(new_task))
         return self.tasks
     
-    def add_task(self, task):
-        self.tasks.append(Task(task))
+    def return_tasks(self):
+        return self.tasks
 
 class File:
     def __init__(self, file):
@@ -49,7 +60,7 @@ class File:
 
         tasks = Tasks(data)
 
-        return tasks.return_tasks()
+        return tasks
 
     def write(self, tasks):
         """writes tasks to the to-do list"""
@@ -70,13 +81,13 @@ class User:
     
     def write(self):
         if len(self.tasks) > 0:
-            self.user_file.write(self.tasks)
+            self.user_file.write(self.tasks.return_tasks())
         else:
             print('User has no tasks to write!')
     
     def new_task(self, task):
         """makes a new task"""
-        self.tasks.add_task(task)
+        self.tasks += task
   
 
 def main():
