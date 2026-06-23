@@ -33,12 +33,19 @@ class Tasks:
         return(len(self.tasks))
     
     def __add__(self, new_task):
+        if new_task in self.tasks:
+            return self
         if isinstance(new_task, list):
             for i in range(len(new_task)):
                 self.tasks.append(Task(new_task[i]))
         else:
-            self.tasks.append(Tasks(new_task))
-        return self.tasks
+            self.tasks.append(Task(new_task))
+        return self
+    
+    def __sub__(self, target_task):
+        while target_task in self.tasks:
+            self.tasks.remove(target_tasks[i])
+        return self
     
     def return_tasks(self):
         return self.tasks
@@ -62,8 +69,9 @@ class File:
 
         return tasks
 
-    def write(self, tasks):
+    def write(self, tasks_obj):
         """writes tasks to the to-do list"""
+        tasks = tasks_obj.return_tasks()
         with open(self.file_name, 'w') as f:
             f.write('')
 
@@ -80,7 +88,7 @@ class User:
         self.tasks = self.user_file.read()
     
     def write(self):
-        if len(self.tasks.return_tasks()) > 0:
+        if len(self.tasks) > 0:
             self.user_file.write(self.tasks)
         else:
             print('User has no tasks to write!')
