@@ -80,9 +80,8 @@ class User:
         self.tasks = self.user_file.read()
     
     def write(self):
-        if len(self.tasks) > 0:
-            for i in range(len(self.tasks)):
-                self.user_file.write(self.tasks[i].return_tasks())
+        if len(self.tasks.return_tasks()) > 0:
+            self.user_file.write(self.tasks)
         else:
             print('User has no tasks to write!')
     
