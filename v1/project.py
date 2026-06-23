@@ -21,7 +21,7 @@ class Tasks:
             for i in range(len(tasks)):
                 self.tasks.append(Task(tasks[i]))
         else:
-            if len(tasks) > 0:
+            if len(tasks) < 1:
                 self.tasks = [Task('No tasks found')]
             else:
                 self.tasks = [Task(tasks)]
@@ -74,14 +74,15 @@ class File:
 class User:
     def __init__(self, username):
         self.user_file = File(f"{username}.txt")
-        self.tasks = []
+        self.tasks = Tasks([])
         
     def read(self):
         self.tasks = self.user_file.read()
     
     def write(self):
         if len(self.tasks) > 0:
-            self.user_file.write(self.tasks.return_tasks())
+            for i in range(len(self.tasks)):
+                self.user_file.write(self.tasks[i].return_tasks())
         else:
             print('User has no tasks to write!')
     
