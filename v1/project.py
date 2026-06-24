@@ -43,8 +43,15 @@ class Tasks:
         return self
     
     def __sub__(self, target_task):
-        while target_task in self.tasks:
-            self.tasks.remove(target_tasks[i])
+        list_of_tasks = []
+        i = 0
+        while i != len(self.tasks):
+            list_of_tasks.append(self.tasks[i].return_task())
+            if self.tasks[i].return_task() == target_task:
+                list_of_tasks.remove(target_task)
+                self.tasks.remove(self.tasks[i])
+                i -= 1
+            i += 1
         return self
     
     def return_tasks(self):
@@ -96,14 +103,24 @@ class User:
     def new_task(self, task):
         """makes a new task"""
         self.tasks += task
-  
+    
+    def remove_task(self, task):
+        """removes a task"""
+        self.tasks -= task
+
 
 def main():
     """The main project loop"""
     kid1 = User('kid1')
     kid1.read()
-    task = input('whats ur task: ')
-    kid1.new_task(task)
+    task = 'go'
+    while not task.lower() in ['quit','q']:
+        task = input('whats ur task: ')
+        if not task.lower() in ['quit', 'q']:
+            kid1.new_task(task)
+    kid1.write()
+    task = input('What task do you want to remove? ')
+    kid1.remove_task(task)
     kid1.write()
 
 main()
