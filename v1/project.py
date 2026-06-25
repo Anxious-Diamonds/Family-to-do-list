@@ -53,12 +53,10 @@ class Tasks:
         return self
     
     def __sub__(self, target_task):
-        list_of_tasks = []
         i = 0
         while i != len(self.tasks):
-            list_of_tasks.append(self.tasks[i].return_task())
             if self.tasks[i].return_task() == target_task:
-                list_of_tasks.remove(target_task)
+                self.raw_tasks.remove(target_task)
                 self.tasks.remove(self.tasks[i])
                 i -= 1
             i += 1
