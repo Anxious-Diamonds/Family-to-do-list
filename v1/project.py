@@ -17,8 +17,10 @@ class Task:
 class Tasks:
     def __init__(self, tasks):
         if isinstance(tasks, list):
+            self.raw_tasks = []
             self.tasks = []
             for i in range(len(tasks)):
+                self.raw_tasks.append(tasks[i])
                 self.tasks.append(Task(tasks[i]))
         else:
             if len(tasks) < 1:
@@ -33,13 +35,21 @@ class Tasks:
         return(len(self.tasks))
     
     def __add__(self, new_task):
-        if new_task in self.tasks:
+        if new_task in self.raw_tasks:
             return self
         if isinstance(new_task, list):
             for i in range(len(new_task)):
+                # raw
+                self.raw_tasks.append(new_task[i])
+                # obj
                 self.tasks.append(Task(new_task[i]))
+                
         else:
+            # raw
+            self.raw_tasks.append(new_task)
+            # obj
             self.tasks.append(Task(new_task))
+            
         return self
     
     def __sub__(self, target_task):
