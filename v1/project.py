@@ -139,5 +139,6 @@ def main():
     kid1.remove_task(task)
     kid1.write()
     gui.start()
+    # how does sprint work
 
 main()
