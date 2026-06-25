@@ -1,10 +1,17 @@
 """A family to-do list"""
-import tkinter
+import tkinter as tk
 import os
 
 class GUI:
     def __init__(self):
-        pass
+        self.root = tk.Tk()
+        # change this string value if you want to change the title of the
+        # window!
+        self.root.title("Family to-do list")
+        self.root.geometry("400x400")
+    
+    def start(self):
+        self.root.mainloop()
 
 class Task:
     def __init__(self, task):
@@ -119,6 +126,7 @@ class User:
 
 def main():
     """The main project loop"""
+    gui = GUI()
     kid1 = User('kid1')
     kid1.read()
     task = 'go'
@@ -130,5 +138,6 @@ def main():
     task = input('What task do you want to remove? ')
     kid1.remove_task(task)
     kid1.write()
+    gui.start()
 
 main()
