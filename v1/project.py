@@ -13,17 +13,27 @@ class GUI:
     def start(self):
         self.root.mainloop()
 
+class Task:
+    def __init__(self, task):
+        self.task = task
+    def __str__(self):
+        return(f"Task: {self.task}.")
+    def return_task(self):
+        return self.task
+
 class Tasks:
     def __init__(self, tasks):
         if isinstance(tasks, list):
+            self.raw_tasks = []
             self.tasks = []
             for i in range(len(tasks)):
-                self.tasks.append(tasks[i])
+                self.raw_tasks.append(tasks[i])
+                self.tasks.append(Task(tasks[i]))
         else:
             if len(tasks) < 1:
-                self.tasks = ['No tasks found']
+                self.tasks = [Task('No tasks found')]
             else:
-                self.tasks = tasks
+                self.tasks = [Task(tasks)]
 
     def __str__(self):
         return(f"Tasks: {self.tasks}")
@@ -32,21 +42,28 @@ class Tasks:
         return(len(self.tasks))
     
     def __add__(self, new_task):
-        if new_task in self.tasks:
+        if new_task in self.raw_tasks:
             return self
         if isinstance(new_task, list):
             for i in range(len(new_task)):
-                self.tasks.append(new_task[i])
+                # raw
+                self.raw_tasks.append(new_task[i])
+                # obj
+                self.tasks.append(Task(new_task[i]))
                 
         else:
-            self.tasks.append(new_task)
+            # raw
+            self.raw_tasks.append(new_task)
+            # obj
+            self.tasks.append(Task(new_task))
             
         return self
     
     def __sub__(self, target_task):
         i = 0
         while i != len(self.tasks):
-            if self.tasks[i] == target_task:
+            if self.tasks[i].return_task() == target_task:
+                self.raw_tasks.remove(target_task)
                 self.tasks.remove(self.tasks[i])
                 i -= 1
             i += 1
