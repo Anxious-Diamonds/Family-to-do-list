@@ -1,17 +1,64 @@
 """A family to-do list"""
 import tkinter as tk
+import tkinter.font as tkFont
 import os
 
 class GUI:
-    def __init__(self):
+    def __init__(self, current_user):
+        self.current_user = current_user
+        
+        # sets up root
         self.root = tk.Tk()
+        self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         # change this string value if you want to change the title of the
         # window!
         self.root.title("Family to-do list")
         self.root.geometry("400x400")
+        
+        std_font = tkFont.Font(family="Arial", size=14, weight="normal")
+
+        # sets up frame
+        self.frame = tk.Frame(self.root)
+        self.frame.pack(fill = "both", expand = True)
+
+        # sets up tkvars
+        self.task_text = tk.IntVar()
+        self.task_text.set("Write your task here")
+
+        # sets up inputs
+        self.task_input = tk.Entry(self.frame, textvariable = self.task_text, \
+                                   font=std_font)
+        self.task_input.pack()
+
+        # sets up buttons
+        self.attained = tk.Button(self.frame, text = "✓", font=std_font, \
+                                  command = self._attainment)
+        self.attained.pack()
+        
     
     def start(self):
         self.root.mainloop()
+    
+    def _attainment(self):
+        """make the task"""
+        tast_text_str = self.task_text.get()
+        self.current_user.new_task(tast_text_str)
+        self.task_text.set("Write your task here")
+        self._update_list()
+
+    def _on_closing(self):
+        self.current_user.write()
+        self.root.destroy()
+
+    def _update_list(self):
+        """refreshes the shown tasks"""
+        pass
+
+    def change_user(self, new_user):
+        """changes the user"""
+        self.current_user = new_user
+        
+        
 
 class Task:
     def __init__(self, task):
@@ -99,7 +146,7 @@ class File:
 
         with open(self.file_name, 'a') as f:
             for i in range(len(tasks)):
-                f.write(f"{tasks[i].return_task()}\n")
+                f.write(f"{tasks[i]}\n")
                 print(f"Writing {tasks[i]}")
 class User:
     def __init__(self, username):
@@ -126,8 +173,8 @@ class User:
 
 def main():
     """The main project loop"""
-    gui = GUI()
     kid1 = User('kid1')
+    gui = GUI(kid1)
     kid1.read()
     task = 'go'
     while not task.lower() in ['quit','q']:
