@@ -6,6 +6,7 @@ import os
 class GUI:
     def __init__(self, current_user):
         self.current_user = current_user
+        self.user_tasks = self.current_user.read()
         
         # sets up root
         self.root = tk.Tk()
@@ -22,18 +23,31 @@ class GUI:
         self.frame.pack(fill = "both", expand = True)
 
         # sets up tkvars
-        self.task_text = tk.IntVar()
+        self.task_text = tk.StringVar()
         self.task_text.set("Write your task here")
 
         # sets up inputs
-        self.task_input = tk.Entry(self.frame, textvariable = self.task_text, \
+        self.task_input = tk.Entry(self.frame, textvariable = self.task_text,\
                                    font=std_font)
         self.task_input.pack()
 
         # sets up buttons
-        self.attained = tk.Button(self.frame, text = "✓", font=std_font, \
+        self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
                                   command = self._attainment)
         self.attained.pack()
+        self.kill = tk.Button(self.frame, text = "KILL TASK", font=std_font,\
+                              command = self._kill)
+        self.kill.pack()
+        
+        # sets up list box
+        self.lb = tk.Listbox(self.root)
+        self.lb.pack()
+        print(self.user_tasks)
+        try:
+            for i in range(len(self.user_tasks)):
+                self.lb.insert("END", self.user_tasks[i].return_task())
+        except TypeError:
+            self.lb.insert(0, "Try adding a task!")
         
     
     def start(self):
@@ -41,10 +55,15 @@ class GUI:
     
     def _attainment(self):
         """make the task"""
-        tast_text_str = self.task_text.get()
-        self.current_user.new_task(tast_text_str)
+        task_text_str = self.task_text.get()
+        if not task_text_str == "Write your task here":
+            self.current_user.new_task(tast_text_str)
         self.task_text.set("Write your task here")
         self._update_list()
+    
+    def _kill(self):
+        dead_index = self.lb.curselection()
+        self.lb.delete(dead_index)
 
     def _on_closing(self):
         self.current_user.write()
@@ -146,7 +165,7 @@ class File:
 
         with open(self.file_name, 'a') as f:
             for i in range(len(tasks)):
-                f.write(f"{tasks[i]}\n")
+                f.write(f"{tasks[i].return_task()}\n")
                 print(f"Writing {tasks[i]}")
 class User:
     def __init__(self, username):
