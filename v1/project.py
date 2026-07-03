@@ -6,7 +6,8 @@ import os
 class GUI:
     def __init__(self, current_user):
         self.current_user = current_user
-        self.user_tasks = self.current_user.read()
+        self.current_user.read()
+        self.user_tasks = self.current_user.return_user_tasks_obj()
         
         # sets up root
         self.root = tk.Tk()
@@ -17,7 +18,7 @@ class GUI:
         self.root.geometry("400x400")
         
         std_font = tkFont.Font(family="Arial", size=14, weight="normal")
-
+ 
         # sets up frame
         self.frame = tk.Frame(self.root)
         self.frame.pack(fill = "both", expand = True)
@@ -40,14 +41,16 @@ class GUI:
         self.kill.pack()
         
         # sets up list box
-        self.lb = tk.Listbox(self.root)
-        self.lb.pack()
-        print(self.user_tasks)
+        self.task_list_box = tk.Listbox(self.root)
+        self.task_list_box.pack()
+        #print(self.user_tasks)
         try:
             for i in range(len(self.user_tasks)):
-                self.lb.insert("END", self.user_tasks[i].return_task())
+                print(self.user_tasks[i].return_task())
+                self.task_list_box.insert("END", self.user_tasks[i].return_task())
+                
         except TypeError:
-            self.lb.insert(0, "Try adding a task!")
+            self.task_list_box.insert(0, "Try adding a task!")
         
     
     def start(self):
@@ -57,13 +60,16 @@ class GUI:
         """make the task"""
         task_text_str = self.task_text.get()
         if not task_text_str == "Write your task here":
-            self.current_user.new_task(tast_text_str)
+            self.current_user.new_task(task_text_str)
         self.task_text.set("Write your task here")
         self._update_list()
     
     def _kill(self):
-        dead_index = self.lb.curselection()
-        self.lb.delete(dead_index)
+        dead_index = self.task_list_box.curselection()
+        if len(dead_index) >= 1:
+            self.task_list_box.delete(dead_index)
+            print(self.user_tasks)
+            self.user_tasks -= self.user_tasks[dead_index[0]]
 
     def _on_closing(self):
         self.current_user.write()
@@ -175,6 +181,9 @@ class User:
     def read(self):
         self.tasks = self.user_file.read()
     
+    def return_user_tasks(self):
+        return self.tasks
+    
     def write(self):
         if len(self.tasks) > 0:
             self.user_file.write(self.tasks)
@@ -195,15 +204,15 @@ def main():
     kid1 = User('kid1')
     gui = GUI(kid1)
     kid1.read()
-    task = 'go'
-    while not task.lower() in ['quit','q']:
-        task = input('whats ur task: ')
-        if not task.lower() in ['quit', 'q']:
-            kid1.new_task(task)
-    kid1.write()
-    task = input('What task do you want to remove? ')
-    kid1.remove_task(task)
-    kid1.write()
+#     task = 'go'
+#     while not task.lower() in ['quit','q']:
+#         task = input('whats ur task: ')
+#         if not task.lower() in ['quit', 'q']:
+#             kid1.new_task(task)
+#     kid1.write()
+#     task = input('What task do you want to remove? ')
+#     kid1.remove_task(task)
+#     kid1.write()
     gui.start()
 
 main()
