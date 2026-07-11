@@ -7,7 +7,6 @@ class GUI:
     def __init__(self, current_user):
         self.current_user = current_user
         self.current_user.read()
-        self.user_tasks = self.current_user.return_user_tasks()
         
         # sets up root
         self.root = tk.Tk()
@@ -45,14 +44,16 @@ class GUI:
         self.task_list_box.pack()
         #print(self.user_tasks)
         try:
-            for i in range(len(self.user_tasks)):
-                print(self.user_tasks[i].return_task())
-                self.task_list_box.insert("end", self.user_tasks[i].return_task())
+            for i in range(len(self.current_user.return_user_tasks())):
+                print(self.current_user.return_user_tasks()[i].return_task())
+                self.task_list_box.insert("end", \
+                    self.current_user.return_user_tasks()[i].return_task())
                 
         except TypeError:
             self.task_list_box.insert(0, "Try adding a task!")
         
-        self.user_tasks -= self.user_tasks[0].return_task()
+        self.current_user.remove_task(\
+                self.current_user.return_user_tasks()[0].return_task())
         
     
     def start(self):
@@ -64,7 +65,7 @@ class GUI:
         if not task_text_str == "Write your task here":
             self.current_user.new_task(task_text_str)
         self.task_text.set("Write your task here")
-        print(self.user_tasks)
+        print(self.current_user.return_user_tasks())
         
         self._update_list()
     
@@ -74,10 +75,8 @@ class GUI:
             dead_index = dead_index[0]
         if isinstance(dead_index, int):
             self.task_list_box.delete(dead_index)
-            tasks = self.user_tasks.return_tasks()
-            self.user_tasks -= self.user_tasks[dead_index]
-            
-#             self.user_tasks -= tasks[dead_index]
+            self.current_user.remove_task(\
+                self.current_user.return_user_tasks()[dead_index].return_task())
 
     def _on_closing(self):
         self.current_user.write()
@@ -85,7 +84,8 @@ class GUI:
 
     def _update_list(self):
         """refreshes the shown tasks"""
-        self.task_list_box.insert("end", self.user_tasks[-1].return_task())
+        self.task_list_box.insert("end", \
+                    self.current_user.return_user_tasks()[-1].return_task())
 
     def change_user(self, new_user):
         """changes the user"""
