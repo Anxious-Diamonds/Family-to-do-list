@@ -52,8 +52,8 @@ class GUI:
         except TypeError:
             self.task_list_box.insert(0, "Try adding a task!")
         
-        self.current_user.remove_task(\
-                self.current_user.return_user_tasks()[0].return_task())
+#         self.current_user.remove_task(\
+#                 self.current_user.return_user_tasks()[0].return_task())
         
     
     def start(self):
@@ -62,12 +62,15 @@ class GUI:
     def _attainment(self):
         """make the task"""
         task_text_str = self.task_text.get()
-        if not task_text_str == "Write your task here":
+        if not task_text_str in ["Write your task here", ""]:
+            initial_len = len(self.current_user.return_user_tasks())
             self.current_user.new_task(task_text_str)
-        self.task_text.set("Write your task here")
-        print(self.current_user.return_user_tasks())
+            if initial_len != len(self.current_user.return_user_tasks()):
+                self._update_list()
+                self.task_text.set("")
         
-        self._update_list()
+        
+#         print(self.current_user.return_user_tasks())
     
     def _kill(self):
         dead_index = self.task_list_box.curselection()
@@ -176,14 +179,18 @@ class File:
 
     def write(self, tasks_obj):
         """writes tasks to the to-do list"""
-        tasks = tasks_obj.return_tasks()
-        with open(self.file_name, 'w') as f:
-            f.write('')
+        if isinstance(tasks_obj, Tasks):
+            tasks = tasks_obj.return_tasks()
+            with open(self.file_name, 'w') as f:
+                f.write('')
 
-        with open(self.file_name, 'a') as f:
-            for i in range(len(tasks)):
-                f.write(f"{tasks[i].return_task()}\n")
-                print(f"Writing {tasks[i]}")
+            with open(self.file_name, 'a') as f:
+                for i in range(len(tasks)):
+                    f.write(f"{tasks[i].return_task()}\n")
+                    print(f"Writing {tasks[i]}")
+        else:
+            with open(self.file_name, 'w') as f:
+                f.write('')
 class User:
     def __init__(self, username):
         self.user_file = File(f"{username}.txt")
@@ -200,6 +207,7 @@ class User:
             self.user_file.write(self.tasks)
         else:
             print('User has no tasks to write!')
+            self.user_file.write('Write nothing')
     
     def new_task(self, task):
         """makes a new task"""
