@@ -38,6 +38,9 @@ class GUI:
         self.kill = tk.Button(self.frame, text = "KILL TASK", font=std_font,\
                               command = self._kill)
         self.kill.pack()
+        self.edit = tk.Button(self.frame, text = "Edit", font=std_font,\
+                              command = self._edit)
+        self.edit.pack()
         
         # sets up list box
         self.task_list_box = tk.Listbox(self.root)
@@ -68,9 +71,15 @@ class GUI:
             if initial_len != len(self.current_user.return_user_tasks()):
                 self._update_list()
                 self.task_text.set("")
-        
-        
-#         print(self.current_user.return_user_tasks())
+    
+    def _edit(self):
+        """edits a task"""
+        edit_index = self.task_list_box.curselection()
+        if len(edit_index) >= 1:
+            edit_index = edit_index[0]
+            temp_task = self.current_user.return_user_tasks()[edit_index]
+            self._kill()
+            self.task_text.set(temp_task.return_task())
     
     def _kill(self):
         dead_index = self.task_list_box.curselection()
