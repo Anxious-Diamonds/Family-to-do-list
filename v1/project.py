@@ -26,10 +26,18 @@ class GUI:
         self.task_text = tk.StringVar()
         self.task_text.set("Write your task here")
 
+        self.quantity_text = tk.StringVar()
+        self.quantity_text.set("Write your quantity of the task here, or leave"
+                               " blank for no quantity")
+
         # sets up inputs
         self.task_input = tk.Entry(self.frame, textvariable = self.task_text,\
                                    font=std_font)
         self.task_input.pack()
+        self.quantity_input = tk.Entry(self.frame, \
+                                       textvariable = self.quantity_text,\
+                                       font=std_font)
+        self.quantity_input.pack()
 
         # sets up buttons
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
@@ -48,15 +56,15 @@ class GUI:
         #print(self.user_tasks)
         try:
             for i in range(len(self.current_user.return_user_tasks())):
-                print(self.current_user.return_user_tasks()[i].return_task_and_quantity())
+                print(self.current_user.return_user_tasks()[i])
                 self.task_list_box.insert("end", \
-                    self.current_user.return_user_tasks()[i].return_task_and_quantity())
+                    self.current_user.return_user_tasks()[i])
                 
         except TypeError:
             self.task_list_box.insert(0, "Try adding a task!")
         
 #         self.current_user.remove_task(\
-#                 self.current_user.return_user_tasks()[0].return_task_and_quantity())
+#                 self.current_user.return_user_tasks()[0].return_task())
         
     
     def start(self):
@@ -65,12 +73,15 @@ class GUI:
     def _attainment(self):
         """make the task"""
         task_text_str = self.task_text.get()
-        if not task_text_str in ["Write your task here", ""]:
+        quantity_text_str = self.quantity_text.get()
+        if not task_text_str in ["Write your task here", ""] and not quantity_text_str in\
+           ["Write your quantity of the task here, or leave blank for no quantity", ""]:
             initial_len = len(self.current_user.return_user_tasks())
-            self.current_user.new_task(task_text_str)
+            self.current_user.new_task(task_text_str, quantity_text_str)
             if initial_len != len(self.current_user.return_user_tasks()):
                 self._update_list()
                 self.task_text.set("")
+                self.quantity_text.set("")
     
     def _edit(self):
         """edits a task"""
@@ -79,7 +90,7 @@ class GUI:
             edit_index = edit_index[0]
             temp_task = self.current_user.return_user_tasks()[edit_index]
             self._kill()
-            self.task_text.set(temp_task.return_task_and_quantity())
+            self.task_text.set(temp_task.return_task())
     
     def _kill(self):
         dead_index = self.task_list_box.curselection()
@@ -88,7 +99,7 @@ class GUI:
         if isinstance(dead_index, int):
             self.task_list_box.delete(dead_index)
             self.current_user.remove_task(\
-                self.current_user.return_user_tasks()[dead_index].return_task_and_quantity())
+                self.current_user.return_user_tasks()[dead_index].return_task())
 
     def _on_closing(self):
         self.current_user.write()
@@ -97,7 +108,7 @@ class GUI:
     def _update_list(self):
         """refreshes the shown tasks"""
         self.task_list_box.insert("end", \
-                    self.current_user.return_user_tasks()[-1].return_task_and_quantity())
+                    self.current_user.return_user_tasks()[-1])
 
     def change_user(self, new_user):
         """changes the user"""
@@ -106,15 +117,17 @@ class GUI:
         
 
 class Task:
-    def __init__(self, task):
+    def __init__(self, whole_task):
         try:
-            self.task, self.quantity = task.split(",")
+            self.task, self.quantity = whole_task.split(",")
         except ValueError:
+            print(self.task, self.quantity)
             raise Exception("Task is formatted incorrectly!")
     def __str__(self):
-        return(f"Task: {self.task}: {self.quantity}.")
-    def return_task_and_quantity(self):
-        return self.task +": " + self.quantity
+        if self.quantity != "":
+            return(f"{self.task}: {self.quantity}")
+        else:
+            return(f"{self.task}")
     def return_task(self):
         return self.task
     def return_quantity(self):
@@ -143,7 +156,8 @@ class Tasks:
     def __getitem__(self, index):
         return self.tasks[index]
     
-    def __add__(self, new_task):
+    def __add__(self, task_quantity):
+        new_task, new_quantity = task_quantity
         if new_task in self.raw_tasks:
             return self
         if isinstance(new_task, list):
@@ -151,21 +165,27 @@ class Tasks:
                 # raw
                 self.raw_tasks.append(new_task[i])
                 # obj
-                self.tasks.append(Task(new_task[i]))
-                
+                well_done_task = new_task[i] + ', ' + new_quantity[i]
+                self.tasks.append(Task(well_done_task))
+
         else:
             # raw
+            #TODO: RAW TASKS ARE CURRENTLY THE WHOLE THING! NOT THE FIRST ONES! USE THE SPLIT THING BIT FIRST PART!
             self.raw_tasks.append(new_task)
             # obj
-            self.tasks.append(Task(new_task))
-            
+            well_done_task = new_task + ',' + new_quantity
+            self.tasks.append(Task(well_done_task))
+
         return self
     
     def __sub__(self, target_task):
         i = 0
         while i != len(self.tasks):
-            if self.tasks[i].return_task_and_quantity() == target_task:
-                self.raw_tasks.remove(target_task)
+            if self.tasks[i].return_task() == target_task:
+                try:
+                    self.raw_tasks.remove(target_task)
+                except ValueError:
+                    pass
                 self.tasks.remove(self.tasks[i])
                 i -= 1
             i += 1
@@ -203,7 +223,7 @@ class File:
             with open(self.file_name, 'a') as f:
                 for i in range(len(tasks)):
                     f.write(f"{tasks[i].return_task()}, {tasks[i].return_quantity()}\n")
-                    print(f"Writing {tasks[i]}")
+                    print(f"Writing task '{tasks[i]}'.")
         else:
             with open(self.file_name, 'w') as f:
                 f.write('')
@@ -225,9 +245,9 @@ class User:
             print('User has no tasks to write!')
             self.user_file.write('Write nothing')
     
-    def new_task(self, task):
+    def new_task(self, task, quantity):
         """makes a new task"""
-        self.tasks += task
+        self.tasks += (task, quantity)
     
     def remove_task(self, task):
         """removes a task"""
@@ -242,8 +262,9 @@ def main():
     task = 'go, 3'
     while not task.lower() in ['quit','q']:
         task = input('whats ur task: ')
+        task, quantity = task.split(',')
         if not task.lower() in ['quit', 'q']:
-            kid1.new_task(task)
+            kid1.new_task(task, quantity)
     kid1.write()
     task = input('What task do you want to remove? ')
     kid1.remove_task(task)
