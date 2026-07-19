@@ -99,7 +99,7 @@ class GUI:
         if isinstance(dead_index, int):
             self.task_list_box.delete(dead_index)
             self.current_user.remove_task(\
-                self.current_user.return_user_tasks()[dead_index].return_task())
+                self.current_user.return_user_tasks()[dead_index])
             print(self.current_user.return_user_tasks())
 
     def _on_closing(self):
@@ -137,10 +137,8 @@ class Task:
 class Tasks:
     def __init__(self, tasks):
         if isinstance(tasks, list):
-            self.raw_tasks = []
             self.tasks = []
             for i in range(len(tasks)):
-                self.raw_tasks.append(tasks[i])
                 self.tasks.append(Task(tasks[i]))
         else:
             if len(tasks) < 1:
@@ -162,37 +160,25 @@ class Tasks:
     
     def __add__(self, task_quantity):
         new_task, new_quantity = task_quantity
-        if new_task in self.raw_tasks:
-            return self
-        if isinstance(new_task, list):
-            for i in range(len(new_task)):
-                # raw
-                self.raw_tasks.append(new_task[i])
-                # obj
-                well_done_task = new_task[i] + ', ' + new_quantity[i]
-                self.tasks.append(Task(well_done_task))
-
-        else:
-            # raw
-            #TODO: RAW TASKS ARE CURRENTLY THE WHOLE THING! NOT THE FIRST ONES! USE THE SPLIT THING BIT FIRST PART!
-            self.raw_tasks.append(new_task)
-            # obj
+        exist = False
+        for i in range(len(self.tasks)):
+            if self.tasks[i].return_task() == new_task:
+                if self.tasks[i].return_quantity() == new_quantity:
+                    exist = True
+        if exist == False:
             well_done_task = new_task + ',' + new_quantity
             self.tasks.append(Task(well_done_task))
 
         return self
     
-    def __sub__(self, target_task):
+    def __sub__(self, task_obj):
         i = 0
         while i != len(self.tasks):
-            if self.tasks[i].return_task() == target_task:
-                try:
-                    self.raw_tasks.remove(target_task)
-                except ValueError:
-                    pass
+            if self.tasks[i] == task_obj:
                 self.tasks.remove(self.tasks[i])
                 i -= 1
             i += 1
+
         return self
     
     def return_tasks(self):
@@ -253,9 +239,9 @@ class User:
         """makes a new task"""
         self.tasks += (task.strip(), quantity.strip())
     
-    def remove_task(self, task):
+    def remove_task(self, task_obj):
         """removes a task"""
-        self.tasks -= task
+        self.tasks -= task_obj
 
 
 def main():
