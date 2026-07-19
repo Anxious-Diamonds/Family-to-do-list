@@ -88,6 +88,7 @@ class GUI:
             temp_task = self.current_user.return_user_tasks()[edit_index]
             self._kill()
             self.task_text.set(temp_task.return_task())
+            self.quantity_text.set(temp_task.return_quantity())
     
     def _kill(self):
         dead_index = self.task_list_box.curselection()
@@ -162,10 +163,10 @@ class Tasks:
         exist = False
         for i in range(len(self.tasks)):
             if self.tasks[i].return_task() == new_task:
-                if self.tasks[i].return_quantity == new_quantity:
+                if self.tasks[i].return_quantity() == new_quantity:
                     exist = True
-        if exist:
-            well_done_task = new_task + ',' + new_quantity
+        if not exist:
+            well_done_task = new_task.strip() + ',' + new_quantity.strip()
             self.tasks.append(Task(well_done_task))
 
         return self
@@ -210,7 +211,7 @@ class File:
 
             with open(self.file_name, 'a') as f:
                 for i in range(len(tasks)):
-                    f.write(f"{tasks[i].return_task()}, {tasks[i].return_quantity()}\n")
+                    f.write(f"{tasks[i].return_task()},{tasks[i].return_quantity()}\n")
                     print(f"Writing task '{tasks[i]}'.")
         else:
             with open(self.file_name, 'w') as f:
