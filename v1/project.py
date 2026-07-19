@@ -100,6 +100,7 @@ class GUI:
             self.task_list_box.delete(dead_index)
             self.current_user.remove_task(\
                 self.current_user.return_user_tasks()[dead_index].return_task())
+            print(self.current_user.return_user_tasks())
 
     def _on_closing(self):
         self.current_user.write()
@@ -148,7 +149,10 @@ class Tasks:
                 self.tasks = [Task(tasks)]
 
     def __str__(self):
-        return(f"Tasks: {self.tasks}")
+        task_list = []
+        for i in range(len(self.tasks)):
+            task_list.append(str(self.tasks[i]))
+        return(f"Tasks: {str(task_list)}")
     
     def __len__(self):
         return(len(self.tasks))
@@ -247,7 +251,7 @@ class User:
     
     def new_task(self, task, quantity):
         """makes a new task"""
-        self.tasks += (task, quantity)
+        self.tasks += (task.strip(), quantity.strip())
     
     def remove_task(self, task):
         """removes a task"""
@@ -262,8 +266,8 @@ def main():
     task = 'go, 3'
     while not task.lower() in ['quit','q']:
         task = input('whats ur task: ')
-        task, quantity = task.split(',')
         if not task.lower() in ['quit', 'q']:
+            task, quantity = task.split(',')
             kid1.new_task(task, quantity)
     kid1.write()
     task = input('What task do you want to remove? ')
