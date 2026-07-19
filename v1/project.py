@@ -1,6 +1,7 @@
 """A family to-do list"""
 import tkinter as tk
 import tkinter.font as tkFont
+from tkinter import messagebox
 import os
 
 class GUI:
@@ -35,8 +36,8 @@ class GUI:
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
                                   command = self._attainment)
         self.attained.pack()
-        self.kill = tk.Button(self.frame, text = "KILL TASK", font=std_font,\
-                              command = self._kill)
+        self.kill = tk.Button(self.frame, text = "Delete selected task",
+                              font=std_font, command = self._kill)
         self.kill.pack()
         self.edit = tk.Button(self.frame, text = "Edit", font=std_font,\
                               command = self._edit)
@@ -71,6 +72,8 @@ class GUI:
             if initial_len != len(self.current_user.return_user_tasks()):
                 self._update_list()
                 self.task_text.set("")
+            else:
+                messagebox.showwarning("Task exists!", "Task already exists!")
     
     def _edit(self):
         """edits a task"""
