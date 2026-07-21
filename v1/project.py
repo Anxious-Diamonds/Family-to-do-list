@@ -63,9 +63,6 @@ class GUI:
         except TypeError:
             self.task_list_box.insert(0, "Try adding a task!")
         
-#         self.current_user.remove_task(\
-#                 self.current_user.return_user_tasks()[0].return_task())
-        
     
     def start(self):
         self.root.mainloop()
@@ -91,6 +88,7 @@ class GUI:
             temp_task = self.current_user.return_user_tasks()[edit_index]
             self._kill()
             self.task_text.set(temp_task.return_task())
+            self.quantity_text.set(temp_task.return_quantity())
     
     def _kill(self):
         dead_index = self.task_list_box.curselection()
@@ -137,8 +135,10 @@ class Task:
 class Tasks:
     def __init__(self, tasks):
         if isinstance(tasks, list):
+            self.raw_tasks = []
             self.tasks = []
             for i in range(len(tasks)):
+                self.raw_tasks.append(tasks[i])
                 self.tasks.append(Task(tasks[i]))
         else:
             if len(tasks) < 1:
@@ -165,8 +165,8 @@ class Tasks:
             if self.tasks[i].return_task() == new_task:
                 if self.tasks[i].return_quantity() == new_quantity:
                     exist = True
-        if exist == False:
-            well_done_task = new_task + ',' + new_quantity
+        if not exist:
+            well_done_task = new_task.strip() + ',' + new_quantity.strip()
             self.tasks.append(Task(well_done_task))
 
         return self
@@ -178,7 +178,6 @@ class Tasks:
                 self.tasks.remove(self.tasks[i])
                 i -= 1
             i += 1
-
         return self
     
     def return_tasks(self):
@@ -212,7 +211,7 @@ class File:
 
             with open(self.file_name, 'a') as f:
                 for i in range(len(tasks)):
-                    f.write(f"{tasks[i].return_task()}, {tasks[i].return_quantity()}\n")
+                    f.write(f"{tasks[i].return_task()},{tasks[i].return_quantity()}\n")
                     print(f"Writing task '{tasks[i]}'.")
         else:
             with open(self.file_name, 'w') as f:
@@ -256,8 +255,8 @@ def main():
             task, quantity = task.split(',')
             kid1.new_task(task, quantity)
     kid1.write()
-    task = input('What task do you want to remove? ')
-    kid1.remove_task(task)
+#     task = input('What task do you want to remove? ')
+#     kid1.remove_task(task)
     kid1.write()
     gui.start()
 
