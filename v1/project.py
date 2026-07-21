@@ -74,6 +74,7 @@ class GUI:
         if not task_text_str in ["Write your task here", ""] and not quantity_text_str in\
            ["Write your quantity of the task here, or leave blank for no quantity", ""]:
             initial_len = len(self.current_user.return_user_tasks())
+            # makes new task
             self.current_user.new_task(task_text_str, quantity_text_str)
             if initial_len != len(self.current_user.return_user_tasks()):
                 self._update_list()
@@ -82,6 +83,8 @@ class GUI:
     
     def _edit(self):
         """edits a task"""
+        # in case there is a task there already
+        self._attainment()
         edit_index = self.task_list_box.curselection()
         if len(edit_index) >= 1:
             edit_index = edit_index[0]
