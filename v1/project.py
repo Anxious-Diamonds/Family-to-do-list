@@ -27,37 +27,46 @@ class GUI:
         self.task_text = tk.StringVar()
         self.task_text.set("Write your task here")
 
+        self.quantity_text = tk.StringVar()
+        self.quantity_text.set("Write your quantity of the task here, or leave"
+                               " blank for no quantity")
+
         # sets up inputs
         self.task_input = tk.Entry(self.frame, textvariable = self.task_text,\
                                    font=std_font)
         self.task_input.pack()
+        self.quantity_input = tk.Entry(self.frame, \
+                                       textvariable = self.quantity_text,\
+                                       font=std_font)
+        self.quantity_input.pack()
 
         # sets up buttons
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
                                   command = self._attainment)
         self.attained.pack()
-        self.kill = tk.Button(self.frame, text = "Delete selected task",
-                              font=std_font, command = self._kill)
+        self.kill = tk.Button(self.frame, text = "KILL TASK", font=std_font,\
+                              command = self._kill)
         self.kill.pack()
         self.edit = tk.Button(self.frame, text = "Edit", font=std_font,\
                               command = self._edit)
         self.edit.pack()
         
-        # sets up list box
+        # sets up list boxes
         self.task_list_box = tk.Listbox(self.root)
         self.task_list_box.pack()
-        #print(self.user_tasks)
+        self.completed_tasks = tk.Listbox(self.root, bg="grey")
+        #        self.completed_tasks = tk.Listbox(self.root, bg="grey") for later
+        self.completed_tasks.pack()
+
+        # adds all tasks to the list box
         try:
             for i in range(len(self.current_user.return_user_tasks())):
-                print(self.current_user.return_user_tasks()[i].return_task())
+                print(self.current_user.return_user_tasks()[i])
                 self.task_list_box.insert("end", \
-                    self.current_user.return_user_tasks()[i].return_task())
+                    self.current_user.return_user_tasks()[i])
                 
         except TypeError:
             self.task_list_box.insert(0, "Try adding a task!")
-        
-#         self.current_user.remove_task(\
-#                 self.current_user.return_user_tasks()[0].return_task())
         
     
     def start(self):
@@ -66,55 +75,76 @@ class GUI:
     def _attainment(self):
         """make the task"""
         task_text_str = self.task_text.get()
-        if not task_text_str in ["Write your task here", ""]:
+        quantity_text_str = self.quantity_text.get()
+        if not task_text_str in ["Write your task here", ""] and not quantity_text_str in\
+           ["Write your quantity of the task here, or leave blank for no quantity"]:
             initial_len = len(self.current_user.return_user_tasks())
-            self.current_user.new_task(task_text_str)
+            # makes new task
+            self.current_user.new_task(task_text_str, quantity_text_str)
             if initial_len != len(self.current_user.return_user_tasks()):
-                self._update_list()
+                self._add_to_list()
                 self.task_text.set("")
+                self.quantity_text.set("")
             else:
-                messagebox.showwarning("Task exists!", "Task already exists!")
+                tk.messagebox.showwarning("Action Failed",
+                                          "Task already exists!")
     
     def _edit(self):
         """edits a task"""
+        # in case there is a task there already
+        self._attainment()
         edit_index = self.task_list_box.curselection()
         if len(edit_index) >= 1:
             edit_index = edit_index[0]
             temp_task = self.current_user.return_user_tasks()[edit_index]
             self._kill()
             self.task_text.set(temp_task.return_task())
+            self.quantity_text.set(temp_task.return_quantity())
     
     def _kill(self):
         dead_index = self.task_list_box.curselection()
         if len(dead_index) >= 1:
             dead_index = dead_index[0]
         if isinstance(dead_index, int):
+            marked_task = self.current_user.return_user_tasks()[dead_index]
+            # add to completed_tasks
+            self.completed_tasks.insert(0, marked_task)
+            
+            # delete task
             self.task_list_box.delete(dead_index)
-            self.current_user.remove_task(\
-                self.current_user.return_user_tasks()[dead_index].return_task())
+            self.current_user.remove_task(marked_task)
+            print(self.current_user.return_user_tasks())
 
     def _on_closing(self):
         self.current_user.write()
         self.root.destroy()
 
-    def _update_list(self):
+    def _add_to_list(self):
         """refreshes the shown tasks"""
         self.task_list_box.insert("end", \
-                    self.current_user.return_user_tasks()[-1].return_task())
+                    self.current_user.return_user_tasks()[-1])
 
     def change_user(self, new_user):
         """changes the user"""
         self.current_user = new_user
         
-        
 
 class Task:
-    def __init__(self, task):
-        self.task = task
+    def __init__(self, whole_task):
+        try:
+            self.task, self.quantity = whole_task.split(",")
+        except ValueError:
+            print(self.task, self.quantity)
+            raise Exception("Task is formatted incorrectly!")
     def __str__(self):
-        return(f"Task: {self.task}.")
+        if self.quantity != "":
+            return(f"{self.task}: {self.quantity}")
+        else:
+            return(f"{self.task}")
     def return_task(self):
         return self.task
+    def return_quantity(self):
+        return self.quantity
 
 class Tasks:
     def __init__(self, tasks):
@@ -126,12 +156,15 @@ class Tasks:
                 self.tasks.append(Task(tasks[i]))
         else:
             if len(tasks) < 1:
-                self.tasks = [Task('No tasks found')]
+                self.tasks = [Task('No tasks found, 0')]
             else:
                 self.tasks = [Task(tasks)]
 
     def __str__(self):
-        return(f"Tasks: {self.tasks}")
+        task_list = []
+        for i in range(len(self.tasks)):
+            task_list.append(str(self.tasks[i]))
+        return(f"Tasks: {str(task_list)}")
     
     def __len__(self):
         return(len(self.tasks))
@@ -139,29 +172,23 @@ class Tasks:
     def __getitem__(self, index):
         return self.tasks[index]
     
-    def __add__(self, new_task):
-        if new_task in self.raw_tasks:
-            return self
-        if isinstance(new_task, list):
-            for i in range(len(new_task)):
-                # raw
-                self.raw_tasks.append(new_task[i])
-                # obj
-                self.tasks.append(Task(new_task[i]))
-                
-        else:
-            # raw
-            self.raw_tasks.append(new_task)
-            # obj
-            self.tasks.append(Task(new_task))
-            
+    def __add__(self, task_quantity):
+        new_task, new_quantity = task_quantity
+        exist = False
+        for i in range(len(self.tasks)):
+            if self.tasks[i].return_task() == new_task:
+                if self.tasks[i].return_quantity() == new_quantity:
+                    exist = True
+        if not exist:
+            well_done_task = new_task.strip() + ',' + new_quantity.strip()
+            self.tasks.append(Task(well_done_task))
+
         return self
     
-    def __sub__(self, target_task):
+    def __sub__(self, task_obj):
         i = 0
         while i != len(self.tasks):
-            if self.tasks[i].return_task() == target_task:
-                self.raw_tasks.remove(target_task)
+            if self.tasks[i] == task_obj:
                 self.tasks.remove(self.tasks[i])
                 i -= 1
             i += 1
@@ -198,8 +225,8 @@ class File:
 
             with open(self.file_name, 'a') as f:
                 for i in range(len(tasks)):
-                    f.write(f"{tasks[i].return_task()}\n")
-                    print(f"Writing {tasks[i]}")
+                    f.write(f"{tasks[i].return_task()},{tasks[i].return_quantity()}\n")
+                    print(f"Writing task '{tasks[i]}'.")
         else:
             with open(self.file_name, 'w') as f:
                 f.write('')
@@ -221,13 +248,13 @@ class User:
             print('User has no tasks to write!')
             self.user_file.write('Write nothing')
     
-    def new_task(self, task):
+    def new_task(self, task, quantity):
         """makes a new task"""
-        self.tasks += task
+        self.tasks += (task.strip(), quantity.strip())
     
-    def remove_task(self, task):
+    def remove_task(self, task_obj):
         """removes a task"""
-        self.tasks -= task
+        self.tasks -= task_obj
 
 
 def main():
@@ -235,11 +262,12 @@ def main():
     kid1 = User('kid1')
     gui = GUI(kid1)
     kid1.read()
-#     task = 'go'
+#     task = 'go, 3'
 #     while not task.lower() in ['quit','q']:
 #         task = input('whats ur task: ')
 #         if not task.lower() in ['quit', 'q']:
-#             kid1.new_task(task)
+#             task, quantity = task.split(',')
+#             kid1.new_task(task, quantity)
 #     kid1.write()
 #     task = input('What task do you want to remove? ')
 #     kid1.remove_task(task)
