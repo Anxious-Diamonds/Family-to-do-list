@@ -1,6 +1,7 @@
 """A family to-do list"""
 import tkinter as tk
 import tkinter.font as tkFont
+from tkinter import messagebox
 import os
 
 class GUI:
@@ -50,10 +51,14 @@ class GUI:
                               command = self._edit)
         self.edit.pack()
         
-        # sets up list box
+        # sets up list boxes
         self.task_list_box = tk.Listbox(self.root)
         self.task_list_box.pack()
-        #print(self.user_tasks)
+        self.completed_tasks = tk.Listbox(self.root, bg="grey")
+        #        self.completed_tasks = tk.Listbox(self.root, bg="grey") for later
+        self.completed_tasks.pack()
+
+        # adds all tasks to the list box
         try:
             for i in range(len(self.current_user.return_user_tasks())):
                 print(self.current_user.return_user_tasks()[i])
@@ -72,14 +77,17 @@ class GUI:
         task_text_str = self.task_text.get()
         quantity_text_str = self.quantity_text.get()
         if not task_text_str in ["Write your task here", ""] and not quantity_text_str in\
-           ["Write your quantity of the task here, or leave blank for no quantity", ""]:
+           ["Write your quantity of the task here, or leave blank for no quantity"]:
             initial_len = len(self.current_user.return_user_tasks())
             # makes new task
             self.current_user.new_task(task_text_str, quantity_text_str)
             if initial_len != len(self.current_user.return_user_tasks()):
-                self._update_list()
+                self._add_to_list()
                 self.task_text.set("")
                 self.quantity_text.set("")
+            else:
+                tk.messagebox.showwarning("Action Failed",
+                                          "Task already exists!")
     
     def _edit(self):
         """edits a task"""
@@ -98,16 +106,20 @@ class GUI:
         if len(dead_index) >= 1:
             dead_index = dead_index[0]
         if isinstance(dead_index, int):
+            marked_task = self.current_user.return_user_tasks()[dead_index]
+            # add to completed_tasks
+            self.completed_tasks.insert(0, marked_task)
+            
+            # delete task
             self.task_list_box.delete(dead_index)
-            self.current_user.remove_task(\
-                self.current_user.return_user_tasks()[dead_index])
+            self.current_user.remove_task(marked_task)
             print(self.current_user.return_user_tasks())
 
     def _on_closing(self):
         self.current_user.write()
         self.root.destroy()
 
-    def _update_list(self):
+    def _add_to_list(self):
         """refreshes the shown tasks"""
         self.task_list_box.insert("end", \
                     self.current_user.return_user_tasks()[-1])
@@ -115,7 +127,6 @@ class GUI:
     def change_user(self, new_user):
         """changes the user"""
         self.current_user = new_user
-        
         
 
 class Task:
@@ -251,16 +262,16 @@ def main():
     kid1 = User('kid1')
     gui = GUI(kid1)
     kid1.read()
-    task = 'go, 3'
-    while not task.lower() in ['quit','q']:
-        task = input('whats ur task: ')
-        if not task.lower() in ['quit', 'q']:
-            task, quantity = task.split(',')
-            kid1.new_task(task, quantity)
-    kid1.write()
+#     task = 'go, 3'
+#     while not task.lower() in ['quit','q']:
+#         task = input('whats ur task: ')
+#         if not task.lower() in ['quit', 'q']:
+#             task, quantity = task.split(',')
+#             kid1.new_task(task, quantity)
+#     kid1.write()
 #     task = input('What task do you want to remove? ')
 #     kid1.remove_task(task)
-    kid1.write()
+#     kid1.write()
     gui.start()
 
 main()
