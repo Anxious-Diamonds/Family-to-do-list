@@ -71,7 +71,7 @@ class GUI:
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
                                   command = self._attainment, bg=self.good_colour)
         
-        self.kill = tk.Button(self.frame, text = "Complete task",
+        self._complete_task = tk.Button(self.frame, text = "Complete task",
                               font=std_font, command = self._kill,
                               bg=self.good_colour)
         
@@ -101,7 +101,7 @@ class GUI:
         self.task_list_box.grid(row = 4, column = 2, sticky = "NSew",
                                 rowspan=5)
         self.edit.grid(row = 4, column = 4, sticky = "NSew")
-        self.kill.grid(row = 5, column = 4, sticky = "NSew")
+        self._complete_task.grid(row = 5, column = 4, sticky = "NSew")
         
 
         self._completed_tasks_label.grid(row = 9, column = 2, sticky = "NSew")
@@ -164,6 +164,7 @@ class GUI:
     def _edit(self):
         """edits a task"""
         # in case there is a task there already
+        #TODO: allow completed tasks to be edited too, should be pretty simple
         task = self.task_text.get()
         quantity = self.quantity_text.get()
         if self._check_attainment(task, quantity):
