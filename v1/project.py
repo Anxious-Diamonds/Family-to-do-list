@@ -48,16 +48,17 @@ class GUI:
 #         self._quantity_text.set("QUANTITY TEST")
         
         # set up labels
-        self._completed_tasks_label = tk.Label(self._frame,
+        self._completed_tasks_label = tk.Label(self._frame, bg=self._bg_colour,
                                               text="Completed tasks",
                                               font=self._bold_font)
         self._incomplete_tasks_label = tk.Label(self._frame,
-                                              text="Incomplete tasks",
-                                              font=self._bold_font)
-        self._task_entry_label = tk.Label(self._frame,
-                                              text="Task:",
-                                              font=self._bold_font)
-        self._quantity_entry_label = tk.Label(self._frame,
+                                                bg=self._bg_colour,
+                                                text="Incomplete tasks",
+                                                font=self._bold_font)
+        self._task_entry_label = tk.Label(self._frame, bg=self._bg_colour,
+                                          text="Task:",
+                                          font=self._bold_font)
+        self._quantity_entry_label = tk.Label(self._frame, bg=self._bg_colour,
                                               text="Quantity:",
                                               font=self._bold_font)
                                               
@@ -72,12 +73,17 @@ class GUI:
         
 
         # sets up buttons
-        self._attained_button = tk.Button(self._frame, text = "✓", font=self._std_font,\
-                                  command = self._attainment, bg=self._good_colour)
+        self._attained_button = tk.Button(self._frame, text = "✓",
+                                          font=self._std_font,
+                                          command = self._attainment,
+                                          bg=self._bad_colour,
+                                          state="disabled")
         
-        self._complete_task_button = tk.Button(self._frame, text = "Complete task",
-                              font=self._std_font, command = self._kill,
-                              bg=self._good_colour)
+        self._complete_task_button = tk.Button(self._frame,
+                                               text = "Complete task",
+                                               font=self._std_font,
+                                               command = self._kill,
+                                               bg=self._good_colour)
         
         self._edit_button = tk.Button(self._frame, text = "Edit", font=self._std_font,\
                               command = self._edit, bg=self._okay_colour)
