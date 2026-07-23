@@ -12,10 +12,10 @@ class GUI:
         # colours
         self._bg_colour = "#FFFFFF"
 
-        self._good_colour = "#BBF1D2"
-        self._okay_colour = "#EEF8CD"
-        self._eh_colour = "#FFC5AA"
-        self._bad_colour = "#FF9D9D"
+        self._good_colour = "#458B73"
+        self._okay_colour = "#FFD150"
+        self._eh_colour = "#FF9760"
+        self._bad_colour = "#F26076"
         
         # sets up root
         self._root = tk.Tk()
@@ -184,18 +184,19 @@ class GUI:
         if len(edit_index) >= 1:
             edit_index = edit_index[0]
             temp_task = self.current_user.return_user_tasks()[edit_index]
-            self._kill()
+            self._kill(False)
             self._task_text.set(temp_task.return_task())
             self._quantity_text.set(temp_task.return_quantity())
     
-    def _kill(self):
+    def _kill(self, complete=True):
         dead_index = self._task_list_box.curselection()
         if len(dead_index) >= 1:
             dead_index = dead_index[0]
         if isinstance(dead_index, int):
             marked_task = self.current_user.return_user_tasks()[dead_index]
             # add to completed_tasks
-            self._completed_tasks.insert(0, marked_task)
+            if complete:
+                self._completed_tasks.insert(0, marked_task)
             
             # delete task
             self._task_list_box.delete(dead_index)
