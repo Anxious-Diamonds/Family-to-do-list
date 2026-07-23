@@ -26,11 +26,13 @@ class GUI:
         # window!
         self._root.title("Family to-do list")
         self._root.geometry("900x500")
+#         self._root.resizable(False, False)
         
         # fonts
         self._bold_font = tkFont.Font(family="Arial", size=14, weight="bold")
         self._std_font = tkFont.Font(family="Arial", size=14, weight="normal")
         self._small_std_font = tkFont.Font(family="Arial", size=8, weight="normal")
+        self._error_font = tkFont.Font(family="Arial", size=10, weight="normal")
         self._test_font = tkFont.Font(family="Arial", size=1, weight="normal")
 
         # sets up frame
@@ -38,6 +40,8 @@ class GUI:
         self._frame.pack(fill = "both", expand = True)
         
         # sets up variables
+        
+        self._bad_comma_flag = False
 
         # sets up tkvars
         self._task_text = tk.StringVar()
@@ -71,10 +75,14 @@ class GUI:
                                      text="No commas allowed in Task or "\
                                      "Quantity!",
                                      fg=self._bg_colour,
-                                     font=self._small_std_font)
+                                     font=self._error_font)
+        self._fake_attained_label = tk.Label(self._frame, text = "✓",
+                                              font=self._std_font,
+                                              bg=self._bg_colour,
+                                              fg=self._bg_colour)
                                               
 
-        # sets up inputs
+        # sets up entries
         self._task_input = tk.Entry(self._frame, textvariable = self._task_text,\
                                    font=self._std_font)
         
@@ -117,6 +125,7 @@ class GUI:
 
         self._quantity_entry_label.grid(row = 1, column = 1, sticky = "NSew")
         self._quantity_input.grid(row = 1, column = 2, sticky = "NSew")
+        self._fake_attained_label.grid(row = 1, column = 4, sticky = "NSew", pady=6)
         
         self._error_label.grid(row = 2, column = 2, sticky = "NSew")
 
@@ -143,7 +152,7 @@ class GUI:
         
         self._frame.rowconfigure(0, weight = 5)
         self._frame.rowconfigure(1, weight = 5)
-        self._frame.rowconfigure(2, weight = 20)
+        self._frame.rowconfigure(2, weight = 5)
         self._frame.rowconfigure(3, weight = 1)
         self._frame.rowconfigure(4, weight = 1)
         self._frame.rowconfigure(5, weight = 1)
@@ -179,6 +188,7 @@ class GUI:
            ["Write your quantity of the task here, or leave blank for no quantity"]:
             initial_len = len(self.current_user.return_user_tasks())
             # makes new task
+              
             try:
                 self.current_user.new_task(task_text_str, quantity_text_str)
             except AttributeError:
@@ -186,7 +196,11 @@ class GUI:
                 tk.messagebox.showwarning("Action Failed",
                                           "No commas allowed in Task or "
                                           "Quantity!")
+
+
                 return False
+            self._task_happy()
+            
             if initial_len != len(self.current_user.return_user_tasks()):
                 self._add_to_list()
                 self._task_text.set("")
@@ -280,6 +294,9 @@ class GUI:
 
     def _task_error(self):
         self._error_label.config(fg="#ff0000")
+    
+    def _task_happy(self):
+        self._error_label.config(fg="#f3F3f3")
 
     def change_user(self, new_user):
         """changes the user"""
