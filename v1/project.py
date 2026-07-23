@@ -14,7 +14,7 @@ class GUI:
 
         self._good_colour = "#91f2bb"
         self._okay_colour = "#ffff99"
-        self._eh_colour = "##ffb999"
+        self._eh_colour = "#ffb999"
         self._bad_colour = "#ff9999"
         
         self._pretty_colour = "#000134"
