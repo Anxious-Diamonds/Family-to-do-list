@@ -22,6 +22,8 @@ class GUI:
         # sets up frame
         self.frame = tk.Frame(self.root)
         self.frame.pack(fill = "both", expand = True)
+        
+        # sets up variables
 
         # sets up tkvars
         self.task_text = tk.StringVar()
@@ -34,29 +36,37 @@ class GUI:
         # sets up inputs
         self.task_input = tk.Entry(self.frame, textvariable = self.task_text,\
                                    font=std_font)
-        self.task_input.pack()
+        self.task_input.grid(row = 0, column = 1, sticky = "NSew")
         self.quantity_input = tk.Entry(self.frame, \
                                        textvariable = self.quantity_text,\
                                        font=std_font)
-        self.quantity_input.pack()
+        self.quantity_input.grid(row = 1, column = 1, sticky = "NSew")
 
         # sets up buttons
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
                                   command = self._attainment)
-        self.attained.pack()
+        self.attained.grid(row = 0, column = 2, sticky = "NSew")
         self.kill = tk.Button(self.frame, text = "KILL TASK", font=std_font,\
                               command = self._kill)
-        self.kill.pack()
+        self.kill.grid(row = 4, column = 2, sticky = "NSew")
         self.edit = tk.Button(self.frame, text = "Edit", font=std_font,\
                               command = self._edit)
-        self.edit.pack()
+        self.edit.grid(row = 5, column = 2, sticky = "NSew")
+        self.test_button = tk.Button(self.frame, text = "TEST", font=std_font,\
+                              command = self._check_status, bg = "aqua")
+        self.test_button.grid(row=0, column = 4, sticky="NSew")
         
         # sets up list boxes
-        self.task_list_box = tk.Listbox(self.root)
-        self.task_list_box.pack()
-        self.completed_tasks = tk.Listbox(self.root, bg="grey")
+        self.task_list_box = tk.Listbox(self.frame)
+        self.task_list_box.grid(row = 4, column = 1, sticky = "NSew", rowspan=5)
+        self.completed_tasks = tk.Listbox(self.frame, bg="grey")
         #        self.completed_tasks = tk.Listbox(self.root, bg="grey") for later
-        self.completed_tasks.pack()
+        self.completed_tasks.grid(row = 9, column = 1, sticky = "NSew")
+
+        # sets up the grid
+        self.frame.columnconfigure(0, weight = 3)
+        self.frame.columnconfigure(1, weight = 2)
+        self.frame.columnconfigure(2, weight = 1)
 
         # adds all tasks to the list box
         try:
@@ -67,6 +77,8 @@ class GUI:
                 
         except TypeError:
             self.task_list_box.insert(0, "Try adding a task!")
+        
+        self.frame.after(1000, self._check_status)
         
     
     def start(self):
@@ -123,6 +135,31 @@ class GUI:
         """refreshes the shown tasks"""
         self.task_list_box.insert("end", \
                     self.current_user.return_user_tasks()[-1])
+    
+    def _check_status(self):
+        task = self.task_text.get()
+        quantity = self.quantity_text.get()
+        # pre-check before more expensive checks
+        self._check_attainment(task, quantity)
+        
+        
+        self.frame.after(1000, self._check_status)
+    
+    def _check_attainment(self, task, quantity):
+        if not task in ["Write your task here", ""] \
+           and not quantity in\
+           ["Write your quantity of the task here, or leave blank for no quantity"]:
+            exist = False
+            for i in range(len(self.current_user.return_user_tasks())):
+                real_task = self.current_user.return_user_tasks()[i].return_task()
+                real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
+                if task != real_task or quantity != real_quantity:
+                    self.attained.config(state="normal")
+                else:
+                    self.attained.config(state="disabled")
+                    return None
+        else:
+            self.attained.config(state="disabled")
 
     def change_user(self, new_user):
         """changes the user"""
