@@ -12,10 +12,10 @@ class GUI:
         # colours
         self._bg_colour = "#F3F3F3"
 
-        self._good_colour = "#BBF1D2"
+        self._good_colour = "#91f2bb"
         self._okay_colour = "#ffff99"
-        self._eh_colour = "#FFC5AA"
-        self._bad_colour = "#FF9D9D"
+        self._eh_colour = "##ffb999"
+        self._bad_colour = "#ff9999"
         
         self._pretty_colour = "#000134"
         
