@@ -13,9 +13,11 @@ class GUI:
         self._bg_colour = "#F3F3F3"
 
         self._good_colour = "#BBF1D2"
-        self._okay_colour = "#EEF8CD"
+        self._okay_colour = "#ffff99"
         self._eh_colour = "#FFC5AA"
         self._bad_colour = "#FF9D9D"
+        
+        self._pretty_colour = "#000134"
         
         # sets up root
         self._root = tk.Tk()
