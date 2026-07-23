@@ -67,6 +67,11 @@ class GUI:
                                               text="",
                                               fg=self._bg_colour,
                                               font=self._small_std_font)
+        self._error_label = tk.Label(self._frame, bg=self._bg_colour,
+                                     text="No commas allowed in Task or "\
+                                     "Quantity!",
+                                     fg=self._bg_colour,
+                                     font=self._small_std_font)
                                               
 
         # sets up inputs
@@ -112,6 +117,8 @@ class GUI:
 
         self._quantity_entry_label.grid(row = 1, column = 1, sticky = "NSew")
         self._quantity_input.grid(row = 1, column = 2, sticky = "NSew")
+        
+        self._error_label.grid(row = 2, column = 2, sticky = "NSew")
 
         self._incomplete_tasks_label.grid(row = 3, column = 2, sticky = "NSew")
         self._task_list_box.grid(row = 4, column = 2, sticky = "NSew",
@@ -172,7 +179,14 @@ class GUI:
            ["Write your quantity of the task here, or leave blank for no quantity"]:
             initial_len = len(self.current_user.return_user_tasks())
             # makes new task
-            self.current_user.new_task(task_text_str, quantity_text_str)
+            try:
+                self.current_user.new_task(task_text_str, quantity_text_str)
+            except AttributeError:
+                self._task_error()
+                tk.messagebox.showwarning("Action Failed",
+                                          "No commas allowed in Task or "
+                                          "Quantity!")
+                return False
             if initial_len != len(self.current_user.return_user_tasks()):
                 self._add_to_list()
                 self._task_text.set("")
@@ -263,6 +277,9 @@ class GUI:
 #                 print('disabled')
                 return False
         return True
+
+    def _task_error(self):
+        self._error_label.config(fg="#ff0000")
 
     def change_user(self, new_user):
         """changes the user"""
@@ -413,5 +430,8 @@ def main():
     gui.start()
 
 main()
+
+
+
 
 
