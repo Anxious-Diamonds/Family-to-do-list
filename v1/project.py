@@ -10,12 +10,12 @@ class GUI:
         self.current_user.read()
         
         # colours
-        self._bg_colour = "#FFFFFF"
+        self._bg_colour = "#F3F3F3"
 
-        self._good_colour = "#458B73"
-        self._okay_colour = "#FFD150"
-        self._eh_colour = "#FF9760"
-        self._bad_colour = "#F26076"
+        self._good_colour = "#AA96DA"
+        self._okay_colour = "#FFFFD2"
+        self._eh_colour = "#A8D8EA"
+        self._bad_colour = "#A8D8EA"
         
         # sets up root
         self._root = tk.Tk()
@@ -23,7 +23,7 @@ class GUI:
         # change this string value if you want to change the title of the
         # window!
         self._root.title("Family to-do list")
-        self._root.geometry("850x500")
+        self._root.geometry("900x500")
         
         # fonts
         self._bold_font = tkFont.Font(family="Arial", size=14, weight="bold")
