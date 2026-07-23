@@ -89,29 +89,32 @@ class GUI:
         
 
         # sets up the grid
-        self.task_input.grid(row = 0, column = 1, sticky = "NSew")
-        self.attained.grid(row = 0, column = 3, sticky = "NSew")
+        self._task_entry_label.grid(row = 0, column = 1, sticky = "NSew")
+        self.task_input.grid(row = 0, column = 2, sticky = "NSew")
+        self.attained.grid(row = 0, column = 4, sticky = "NSew")
 #         self.test_button.grid(row = 0, column = 4, sticky="NSew")
 
-        self.quantity_input.grid(row = 1, column = 1, sticky = "NSew")
+        self._quantity_entry_label.grid(row = 1, column = 1, sticky = "NSew")
+        self.quantity_input.grid(row = 1, column = 2, sticky = "NSew")
 
-        self._incomplete_tasks_label.grid(row = 3, column = 1, sticky = "NSew")
-        self.task_list_box.grid(row = 4, column = 1, sticky = "NSew",
+        self._incomplete_tasks_label.grid(row = 3, column = 2, sticky = "NSew")
+        self.task_list_box.grid(row = 4, column = 2, sticky = "NSew",
                                 rowspan=5)
-        self.edit.grid(row = 4, column = 3, sticky = "NSew")
-        self.kill.grid(row = 5, column = 3, sticky = "NSew")
+        self.edit.grid(row = 4, column = 4, sticky = "NSew")
+        self.kill.grid(row = 5, column = 4, sticky = "NSew")
         
 
-        self._completed_tasks_label.grid(row = 9, column = 1, sticky = "NSew")
-        self.completed_tasks.grid(row = 10, column = 1, sticky = "NSew",
+        self._completed_tasks_label.grid(row = 9, column = 2, sticky = "NSew")
+        self.completed_tasks.grid(row = 10, column = 2, sticky = "NSew",
                                   rowspan=2)
         
         self.frame.columnconfigure(0, weight = 1)
-        self.frame.columnconfigure(1, weight = 20)
-        self.frame.columnconfigure(2, weight = 1)
+        self.frame.columnconfigure(1, weight = 1)
+        self.frame.columnconfigure(2, weight = 20)
         self.frame.columnconfigure(3, weight = 1)
-        self.frame.columnconfigure(4, weight = 0)
-        self.frame.columnconfigure(5, weight = 1)
+        self.frame.columnconfigure(4, weight = 1)
+        self.frame.columnconfigure(5, weight = 0)
+        self.frame.columnconfigure(6, weight = 1)
         
         self.frame.rowconfigure(0, weight = 5)
         self.frame.rowconfigure(1, weight = 5)
