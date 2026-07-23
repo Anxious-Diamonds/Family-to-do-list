@@ -14,7 +14,7 @@ class GUI:
 
         self._good_colour = "#91f2bb"
         self._okay_colour = "#ffff99"
-        self._eh_colour = "##ffb999"
+        self._eh_colour = "#ffb999"
         self._bad_colour = "#ff9999"
         
         self._pretty_colour = "#000134"
@@ -272,10 +272,13 @@ class GUI:
 class Task:
     def __init__(self, whole_task):
         try:
-            self._task, self._quantity = whole_task.split(",")
-        except ValueError:
-            print(self._task, self._quantity)
-            raise Exception("Task is formatted incorrectly!")
+            try:
+                self._task, self._quantity = whole_task.split(",")
+            except ValueError:
+                print(self._task, self._quantity)
+                raise Exception("Task is formatted incorrectly!")
+        except AttributeError:
+            raise Exception("No commas allowed in task or quantity!")
     def __str__(self):
         if self._quantity != "":
             return(f"{self._task}: {self._quantity}")
