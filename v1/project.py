@@ -61,6 +61,10 @@ class GUI:
         self._quantity_entry_label = tk.Label(self._frame, bg=self._bg_colour,
                                               text="Quantity:",
                                               font=self._bold_font)
+        self._hidden_nothing_label = tk.Label(self._frame, bg=self._bg_colour,
+                                              text="",
+                                              fg=self._bg_colour,
+                                              font=self._small_std_font)
                                               
 
         # sets up inputs
@@ -117,8 +121,10 @@ class GUI:
         self._completed_tasks_label.grid(row = 9, column = 2, sticky = "NSew")
         self._completed_tasks.grid(row = 10, column = 2, sticky = "NSew",
                                   rowspan=2)
+        self._hidden_nothing_label.grid(row = 12, column = 1, sticky = "NSew")
         
-        self._frame.columnconfigure(0, weight = 1)
+        
+        self._frame.columnconfigure(0, weight = 0)
         self._frame.columnconfigure(1, weight = 1)
         self._frame.columnconfigure(2, weight = 20)
         self._frame.columnconfigure(3, weight = 1)
@@ -128,7 +134,7 @@ class GUI:
         
         self._frame.rowconfigure(0, weight = 5)
         self._frame.rowconfigure(1, weight = 5)
-        self._frame.rowconfigure(2, weight = 50)
+        self._frame.rowconfigure(2, weight = 20)
         self._frame.rowconfigure(3, weight = 1)
         self._frame.rowconfigure(4, weight = 1)
         self._frame.rowconfigure(5, weight = 1)
@@ -137,6 +143,8 @@ class GUI:
         self._frame.rowconfigure(8, weight = 1)
         self._frame.rowconfigure(9, weight = 1)
         self._frame.rowconfigure(10, weight = 1)
+        self._frame.rowconfigure(11, weight = 1)
+        self._frame.rowconfigure(12, weight = 0)
 
         # adds all tasks to the list box
         try:
