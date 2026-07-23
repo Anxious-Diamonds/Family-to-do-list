@@ -15,12 +15,18 @@ class GUI:
         # change this string value if you want to change the title of the
         # window!
         self.root.title("Family to-do list")
-        self.root.geometry("850x400")
+        self.root.geometry("850x500")
         
+        bold_font = tkFont.Font(family="Arial", size=14, weight="bold")
         std_font = tkFont.Font(family="Arial", size=14, weight="normal")
         small_std_font = tkFont.Font(family="Arial", size=8, weight="normal")
         test_font = tkFont.Font(family="Arial", size=1, weight="normal")
- 
+
+        self.good_colour = "#BBF1D2"
+        self.okay_colour = "#EEF8CD"
+        self.eh_colour = "#FFC5AA"
+        self.bad_colour = "#FF9D9D"
+
         # sets up frame
         self.frame = tk.Frame(self.root)
         self.frame.pack(fill = "both", expand = True)
@@ -29,13 +35,22 @@ class GUI:
 
         # sets up tkvars
         self.task_text = tk.StringVar()
-#         self.task_text.set("Write your task here")
-        self.task_text.set("TEST TASK")
+        self.task_text.set("Write your task here")
+#         self.task_text.set("TEST TASK")
 
         self.quantity_text = tk.StringVar()
-#         self.quantity_text.set("Write your quantity of the task here, or leave"
-#                                " blank for no quantity")
-        self.quantity_text.set("QUANTITY TEST")
+        self.quantity_text.set("Write your quantity of the task here, or leave"
+                               " blank for no quantity")
+#         self.quantity_text.set("QUANTITY TEST")
+        
+        # set up labels
+        self._completed_tasks_label = tk.Label(self.frame,
+                                              text="Completed tasks",
+                                              font=bold_font)
+        self._incomplete_tasks_label = tk.Label(self.frame,
+                                              text="Incomplete tasks",
+                                              font=bold_font)
+                                              
 
         # sets up inputs
         self.task_input = tk.Entry(self.frame, textvariable = self.task_text,\
@@ -48,36 +63,42 @@ class GUI:
 
         # sets up buttons
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
-                                  command = self._attainment)
+                                  command = self._attainment, bg=self.okay_colour)
         
         self.kill = tk.Button(self.frame, text = "Complete task",
-                              font=std_font, command = self._kill)
+                              font=std_font, command = self._kill,
+                              bg=self.good_colour)
         
         self.edit = tk.Button(self.frame, text = "Edit", font=std_font,\
-                              command = self._edit)
+                              command = self._edit, bg=self.okay_colour)
         
         self.test_button = tk.Button(self.frame, text = "TEST", font=test_font,\
                               command = self._check_status, bg = "aqua")
         
         
         # sets up list boxes
-        self.task_list_box = tk.Listbox(self.frame)
+        self.task_list_box = tk.Listbox(self.frame, bg=self.okay_colour)
         
-        self.completed_tasks = tk.Listbox(self.frame, bg="grey")
+        self.completed_tasks = tk.Listbox(self.frame, bg=self.good_colour)
         
 
         # sets up the grid
         self.task_input.grid(row = 0, column = 1, sticky = "NSew")
         self.attained.grid(row = 0, column = 3, sticky = "NSew")
-        self.test_button.grid(row = 0, column = 4, sticky="NSew")
+#         self.test_button.grid(row = 0, column = 4, sticky="NSew")
 
         self.quantity_input.grid(row = 1, column = 1, sticky = "NSew")
 
-        self.task_list_box.grid(row = 3, column = 1, sticky = "NSew", rowspan=5)
-        self.kill.grid(row = 3, column = 3, sticky = "NSew")
+        self._incomplete_tasks_label.grid(row = 3, column = 1, sticky = "NSew")
+        self.task_list_box.grid(row = 4, column = 1, sticky = "NSew",
+                                rowspan=5)
         self.edit.grid(row = 4, column = 3, sticky = "NSew")
+        self.kill.grid(row = 5, column = 3, sticky = "NSew")
+        
 
-        self.completed_tasks.grid(row = 8, column = 1, sticky = "NSew", rowspan=2)
+        self._completed_tasks_label.grid(row = 9, column = 1, sticky = "NSew")
+        self.completed_tasks.grid(row = 10, column = 1, sticky = "NSew",
+                                  rowspan=2)
         
         self.frame.columnconfigure(0, weight = 1)
         self.frame.columnconfigure(1, weight = 20)
@@ -86,16 +107,17 @@ class GUI:
         self.frame.columnconfigure(4, weight = 0)
         self.frame.columnconfigure(5, weight = 1)
         
-        self.frame.rowconfigure(0, weight = 1)
-        self.frame.rowconfigure(1, weight = 1)
-        self.frame.rowconfigure(2, weight = 500)
+        self.frame.rowconfigure(0, weight = 5)
+        self.frame.rowconfigure(1, weight = 5)
+        self.frame.rowconfigure(2, weight = 50)
         self.frame.rowconfigure(3, weight = 1)
         self.frame.rowconfigure(4, weight = 1)
-        self.frame.rowconfigure(5, weight = 5)
-        self.frame.rowconfigure(6, weight = 1)
+        self.frame.rowconfigure(5, weight = 1)
+        self.frame.rowconfigure(6, weight = 5)
         self.frame.rowconfigure(7, weight = 1)
         self.frame.rowconfigure(8, weight = 1)
         self.frame.rowconfigure(9, weight = 1)
+        self.frame.rowconfigure(10, weight = 1)
 
         # adds all tasks to the list box
         try:
@@ -182,8 +204,8 @@ class GUI:
            and not quantity in\
            ["Write your quantity of the task here, or leave blank for no quantity"]:
             if len(self.current_user.return_user_tasks()) < 1:
-                self.attained.config(state="normal")
-                print('normal')
+                self.attained.config(state="normal", bg=self.good_colour)
+#                 print('normal')
                 return True
             else:
                 if self._check_user_tasks(task, quantity) == False:
@@ -193,8 +215,8 @@ class GUI:
             
             
         else:
-            self.attained.config(state="disabled")
-            print('disabled')
+            self.attained.config(state="disabled", bg=self.bad_colour)
+#             print('disabled')
             return False
         return True
     
@@ -203,11 +225,11 @@ class GUI:
             real_task = self.current_user.return_user_tasks()[i].return_task()
             real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
             if task != real_task or quantity != real_quantity:
-                self.attained.config(state="normal")
-                print('normal')
+                self.attained.config(state="normal", bg=self.good_colour)
+#                 print('normal')
             else:
-                self.attained.config(state="disabled")
-                print('disabled')
+                self.attained.config(state="disabled", bg=self.bad_colour)
+#                 print('disabled')
                 return False
         return True
 
