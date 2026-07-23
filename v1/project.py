@@ -50,6 +50,12 @@ class GUI:
         self._incomplete_tasks_label = tk.Label(self.frame,
                                               text="Incomplete tasks",
                                               font=bold_font)
+        self._task_entry_label = tk.Label(self.frame,
+                                              text="Task:",
+                                              font=bold_font)
+        self._quantity_entry_label = tk.Label(self.frame,
+                                              text="Quantity:",
+                                              font=bold_font)
                                               
 
         # sets up inputs
@@ -63,7 +69,7 @@ class GUI:
 
         # sets up buttons
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
-                                  command = self._attainment, bg=self.okay_colour)
+                                  command = self._attainment, bg=self.good_colour)
         
         self.kill = tk.Button(self.frame, text = "Complete task",
                               font=std_font, command = self._kill,
