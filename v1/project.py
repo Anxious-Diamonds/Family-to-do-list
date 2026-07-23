@@ -15,9 +15,11 @@ class GUI:
         # change this string value if you want to change the title of the
         # window!
         self.root.title("Family to-do list")
-        self.root.geometry("400x400")
+        self.root.geometry("850x400")
         
         std_font = tkFont.Font(family="Arial", size=14, weight="normal")
+        small_std_font = tkFont.Font(family="Arial", size=8, weight="normal")
+        test_font = tkFont.Font(family="Arial", size=1, weight="normal")
  
         # sets up frame
         self.frame = tk.Frame(self.root)
@@ -27,46 +29,73 @@ class GUI:
 
         # sets up tkvars
         self.task_text = tk.StringVar()
-        self.task_text.set("Write your task here")
+#         self.task_text.set("Write your task here")
+        self.task_text.set("TEST TASK")
 
         self.quantity_text = tk.StringVar()
-        self.quantity_text.set("Write your quantity of the task here, or leave"
-                               " blank for no quantity")
+#         self.quantity_text.set("Write your quantity of the task here, or leave"
+#                                " blank for no quantity")
+        self.quantity_text.set("QUANTITY TEST")
 
         # sets up inputs
         self.task_input = tk.Entry(self.frame, textvariable = self.task_text,\
                                    font=std_font)
-        self.task_input.grid(row = 0, column = 1, sticky = "NSew")
+        
         self.quantity_input = tk.Entry(self.frame, \
                                        textvariable = self.quantity_text,\
                                        font=std_font)
-        self.quantity_input.grid(row = 1, column = 1, sticky = "NSew")
+        
 
         # sets up buttons
         self.attained = tk.Button(self.frame, text = "✓", font=std_font,\
                                   command = self._attainment)
-        self.attained.grid(row = 0, column = 2, sticky = "NSew")
-        self.kill = tk.Button(self.frame, text = "KILL TASK", font=std_font,\
-                              command = self._kill)
-        self.kill.grid(row = 4, column = 2, sticky = "NSew")
+        
+        self.kill = tk.Button(self.frame, text = "Complete task",
+                              font=std_font, command = self._kill)
+        
         self.edit = tk.Button(self.frame, text = "Edit", font=std_font,\
                               command = self._edit)
-        self.edit.grid(row = 5, column = 2, sticky = "NSew")
-        self.test_button = tk.Button(self.frame, text = "TEST", font=std_font,\
+        
+        self.test_button = tk.Button(self.frame, text = "TEST", font=test_font,\
                               command = self._check_status, bg = "aqua")
-        self.test_button.grid(row=0, column = 4, sticky="NSew")
+        
         
         # sets up list boxes
         self.task_list_box = tk.Listbox(self.frame)
-        self.task_list_box.grid(row = 4, column = 1, sticky = "NSew", rowspan=5)
+        
         self.completed_tasks = tk.Listbox(self.frame, bg="grey")
-        #        self.completed_tasks = tk.Listbox(self.root, bg="grey") for later
-        self.completed_tasks.grid(row = 9, column = 1, sticky = "NSew")
+        
 
         # sets up the grid
-        self.frame.columnconfigure(0, weight = 3)
-        self.frame.columnconfigure(1, weight = 2)
+        self.task_input.grid(row = 0, column = 1, sticky = "NSew")
+        self.attained.grid(row = 0, column = 3, sticky = "NSew")
+        self.test_button.grid(row = 0, column = 4, sticky="NSew")
+
+        self.quantity_input.grid(row = 1, column = 1, sticky = "NSew")
+
+        self.task_list_box.grid(row = 3, column = 1, sticky = "NSew", rowspan=5)
+        self.kill.grid(row = 3, column = 3, sticky = "NSew")
+        self.edit.grid(row = 4, column = 3, sticky = "NSew")
+
+        self.completed_tasks.grid(row = 8, column = 1, sticky = "NSew", rowspan=2)
+        
+        self.frame.columnconfigure(0, weight = 1)
+        self.frame.columnconfigure(1, weight = 20)
         self.frame.columnconfigure(2, weight = 1)
+        self.frame.columnconfigure(3, weight = 1)
+        self.frame.columnconfigure(4, weight = 0)
+        self.frame.columnconfigure(5, weight = 1)
+        
+        self.frame.rowconfigure(0, weight = 1)
+        self.frame.rowconfigure(1, weight = 1)
+        self.frame.rowconfigure(2, weight = 500)
+        self.frame.rowconfigure(3, weight = 1)
+        self.frame.rowconfigure(4, weight = 1)
+        self.frame.rowconfigure(5, weight = 5)
+        self.frame.rowconfigure(6, weight = 1)
+        self.frame.rowconfigure(7, weight = 1)
+        self.frame.rowconfigure(8, weight = 1)
+        self.frame.rowconfigure(9, weight = 1)
 
         # adds all tasks to the list box
         try:
@@ -104,7 +133,11 @@ class GUI:
     def _edit(self):
         """edits a task"""
         # in case there is a task there already
-        self._attainment()
+        task = self.task_text.get()
+        quantity = self.quantity_text.get()
+        if self._check_attainment(task, quantity):
+            self._attainment()
+
         edit_index = self.task_list_box.curselection()
         if len(edit_index) >= 1:
             edit_index = edit_index[0]
@@ -139,7 +172,6 @@ class GUI:
     def _check_status(self):
         task = self.task_text.get()
         quantity = self.quantity_text.get()
-        # pre-check before more expensive checks
         self._check_attainment(task, quantity)
         
         
@@ -149,17 +181,35 @@ class GUI:
         if not task in ["Write your task here", ""] \
            and not quantity in\
            ["Write your quantity of the task here, or leave blank for no quantity"]:
-            exist = False
-            for i in range(len(self.current_user.return_user_tasks())):
-                real_task = self.current_user.return_user_tasks()[i].return_task()
-                real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
-                if task != real_task or quantity != real_quantity:
-                    self.attained.config(state="normal")
+            if len(self.current_user.return_user_tasks()) < 1:
+                self.attained.config(state="normal")
+                print('normal')
+                return True
+            else:
+                if self._check_user_tasks(task, quantity) == False:
+                    return False
                 else:
-                    self.attained.config(state="disabled")
-                    return None
+                    return True
+            
+            
         else:
             self.attained.config(state="disabled")
+            print('disabled')
+            return False
+        return True
+    
+    def _check_user_tasks(self, task, quantity):
+        for i in range(len(self.current_user.return_user_tasks())):
+            real_task = self.current_user.return_user_tasks()[i].return_task()
+            real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
+            if task != real_task or quantity != real_quantity:
+                self.attained.config(state="normal")
+                print('normal')
+            else:
+                self.attained.config(state="disabled")
+                print('disabled')
+                return False
+        return True
 
     def change_user(self, new_user):
         """changes the user"""
