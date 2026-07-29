@@ -102,10 +102,14 @@ class GUI:
                                                text = "Complete task",
                                                font=self._std_font,
                                                command = self._kill,
-                                               bg=self._good_colour)
+                                               bg=self._bad_colour,
+                                               state="disabled")
+        # should be good colour when happy
         
         self._edit_button = tk.Button(self._frame, text = "Edit", font=self._std_font,\
-                              command = self._edit, bg=self._okay_colour)
+                                      command = self._edit, bg=self._bad_colour,
+                                      state = "disabled")
+        # should be okay colour when happy
         
         self._test_button = tk.Button(self._frame, text = "TEST", font=self._test_font,\
                               command = self._check_status, bg = "aqua")
@@ -254,6 +258,8 @@ class GUI:
         task = self._task_text.get()
         quantity = self._quantity_text.get()
         self._check_attainment(task, quantity)
+        self._check_edit()
+        self._check_complete_tasks()
         
         
         self._frame.after(1000, self._check_status)
@@ -270,14 +276,27 @@ class GUI:
                 if self._check_user_tasks(task, quantity) == False:
                     return False
                 else:
-                    return True
-            
+                    return True            
             
         else:
             self._attained_button.config(state="disabled", bg=self._bad_colour)
 #             print('disabled')
             return False
         return True
+    
+    def _check_edit(self):
+        edit_index = self._task_list_box.curselection()
+        if len(edit_index) >= 1:
+            self._edit_button.config(state="normal", bg=self._okay_colour)
+        else:
+            self._edit_button.config(state="disabled", bg=self._bad_colour)
+    
+    def _check_complete_tasks(self):
+        complete_index = self._task_list_box.curselection()
+        if len(complete_index) >= 1:
+            self._complete_task_button.config(state="normal", bg=self._good_colour)
+        else:
+            self._complete_task_button.config(state="disabled", bg=self._bad_colour)
     
     def _check_user_tasks(self, task, quantity):
         for i in range(len(self.current_user.return_user_tasks())):
