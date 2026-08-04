@@ -8,7 +8,7 @@ class GUI:
     def __init__(self, current_user):
         self.current_user = current_user
         self.current_user.read()
-        
+
         # colours
         self._bg_colour = "#F3F3F3"
 
@@ -124,7 +124,7 @@ class GUI:
         self._task_entry_label.grid(row = 0, column = 1, sticky = "NSew")
         self._task_input.grid(row = 0, column = 2, sticky = "NSew")
         self._attained_button.grid(row = 0, column = 4, sticky = "NSew")
-#         self._test_button.grid(row = 0, column = 4, sticky="NSew")
+#         self._test_button.grid(row = 0, column = 5, sticky="NSew")
 
         self._quantity_entry_label.grid(row = 1, column = 1, sticky = "NSew")
         self._quantity_input.grid(row = 1, column = 2, sticky = "NSew")
@@ -212,6 +212,8 @@ class GUI:
                 self._task_error('exists')
 #                 tk.messagebox.showwarning("Action Failed",
 #                                           "Task already exists!")
+        else:
+            self._task_error('initial')
     
     def _edit(self):
         """edits a task"""
@@ -268,15 +270,10 @@ class GUI:
         if not task in ["Write your task here", ""] \
            and not quantity in\
            ["Write your quantity of the task here, or leave blank for no quantity"]:
-            if len(self.current_user.return_user_tasks()) < 1:
-                self._attained_button.config(state="normal", bg=self._good_colour)
-#                 print('normal')
-                return True
+            if self._check_user_tasks(task, quantity) == False:
+                return False
             else:
-                if self._check_user_tasks(task, quantity) == False:
-                    return False
-                else:
-                    return True            
+                return True
             
         else:
             self._attained_button.config(state="disabled", bg=self._bad_colour)
@@ -302,22 +299,28 @@ class GUI:
         for i in range(len(self.current_user.return_user_tasks())):
             real_task = self.current_user.return_user_tasks()[i].return_task()
             real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
-            if task != real_task or quantity != real_quantity:
-                self._attained_button.config(state="normal", bg=self._good_colour)
-#                 print('normal')
+            if (task != real_task or quantity != real_quantity):
+                if (not ',' in task and not ',' in quantity):
+                    self._attained_button.config(state="normal", bg=self._good_colour)
+                else:
+                    self._task_error('comma')
             else:
-                self._attained_button.config(state="disabled", bg=self._bad_colour)
-#                 print('disabled')
-                return False
+                self._task_error('exists')
+                # what are the returns for help me
         return True
 
     def _task_error(self, error):
         self._error_label.config(fg="#ff0000")
+        self._attained_button.config(state="disabled", bg=self._bad_colour)
         if error == 'comma':
             self._error_label.config(text="No commas allowed in Task or "
                                      "Quantity!")
         elif error == 'exists':
             self._error_label.config(text="Task already exists!")
+        
+        elif error == 'initial':
+            self._error_label.config(text="Can't make a task or quantity with "
+                                     "the inital text!")
     
     def _task_happy(self):
         self._error_label.config(fg="#f3F3f3")
