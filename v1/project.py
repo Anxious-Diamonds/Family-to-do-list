@@ -72,8 +72,7 @@ class GUI:
                                               fg=self._bg_colour,
                                               font=self._small_std_font)
         self._error_label = tk.Label(self._frame, bg=self._bg_colour,
-                                     text="No commas allowed in Task or "\
-                                     "Quantity!",
+                                     text="",
                                      fg=self._bg_colour,
                                      font=self._error_font)
         self._fake_attained_label = tk.Label(self._frame, text = "✓",
@@ -196,10 +195,10 @@ class GUI:
             try:
                 self.current_user.new_task(task_text_str, quantity_text_str)
             except AttributeError:
-                self._task_error()
-                tk.messagebox.showwarning("Action Failed",
-                                          "No commas allowed in Task or "
-                                          "Quantity!")
+                self._task_error('comma')
+#                 tk.messagebox.showwarning("Action Failed",
+#                                           "No commas allowed in Task or "
+#                                           "Quantity!")
 
 
                 return False
@@ -210,8 +209,9 @@ class GUI:
                 self._task_text.set("")
                 self._quantity_text.set("")
             else:
-                tk.messagebox.showwarning("Action Failed",
-                                          "Task already exists!")
+                self._task_error('exists')
+#                 tk.messagebox.showwarning("Action Failed",
+#                                           "Task already exists!")
     
     def _edit(self):
         """edits a task"""
@@ -311,8 +311,13 @@ class GUI:
                 return False
         return True
 
-    def _task_error(self):
+    def _task_error(self, error):
         self._error_label.config(fg="#ff0000")
+        if error == 'comma':
+            self._error_label.config(text="No commas allowed in Task or "
+                                     "Quantity!")
+        elif error == 'exists':
+            self._error_label.config(text="Task already exists!")
     
     def _task_happy(self):
         self._error_label.config(fg="#f3F3f3")
