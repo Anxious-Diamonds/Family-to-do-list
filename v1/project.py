@@ -94,8 +94,8 @@ class GUI:
         self._attained_button = tk.Button(self._frame, text = "✓",
                                           font=self._std_font,
                                           command = self._attainment,
-                                          bg=self._bad_colour,
-                                          state="disabled")
+                                          bg=self._good_colour,
+                                          state="normal")
         
         self._complete_task_button = tk.Button(self._frame,
                                                text = "Complete task",
@@ -187,8 +187,8 @@ class GUI:
         """make the task"""
         task_text_str = self._task_text.get()
         quantity_text_str = self._quantity_text.get()
-        if not task_text_str in ["Write your task here", ""] and not quantity_text_str in\
-           ["Write your quantity of the task here, or leave blank for no quantity"]:
+        
+        if self._check_user_tasks(task_text_str, quantity_text_str):
             initial_len = len(self.current_user.return_user_tasks())
             # makes new task
               
@@ -196,9 +196,6 @@ class GUI:
                 self.current_user.new_task(task_text_str, quantity_text_str)
             except AttributeError:
                 self._task_error('comma')
-#                 tk.messagebox.showwarning("Action Failed",
-#                                           "No commas allowed in Task or "
-#                                           "Quantity!")
 
 
                 return False
@@ -210,10 +207,7 @@ class GUI:
                 self._quantity_text.set("")
             else:
                 self._task_error('exists')
-#                 tk.messagebox.showwarning("Action Failed",
-#                                           "Task already exists!")
-        else:
-            self._task_error('initial')
+
     
     def _edit(self):
         """edits a task"""
@@ -259,27 +253,11 @@ class GUI:
     def _check_status(self):
         task = self._task_text.get()
         quantity = self._quantity_text.get()
-        self._check_attainment(task, quantity)
+        
         self._check_edit()
         self._check_complete_tasks()
         
-        
         self._frame.after(1000, self._check_status)
-    
-    def _check_attainment(self, task, quantity):
-        if not task in ["Write your task here", ""] \
-           and not quantity in\
-           ["Write your quantity of the task here, or leave blank for no quantity"]:
-            if self._check_user_tasks(task, quantity) == False:
-                return False
-            else:
-                return True
-            
-        else:
-            self._attained_button.config(state="disabled", bg=self._bad_colour)
-#             print('disabled')
-            return False
-        return True
     
     def _check_edit(self):
         edit_index = self._task_list_box.curselection()
@@ -297,20 +275,27 @@ class GUI:
     
     def _check_user_tasks(self, task, quantity):
         user_tasks_len = len(self.current_user.return_user_tasks())
-        if (not ',' in task and not ',' in quantity):
-            if user_tasks_len > 0:
-                for i in range(user_tasks_len):
-                    real_task = self.current_user.return_user_tasks()[i].return_task()
-                    real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
-                    if (task != real_task or quantity != real_quantity):
-                            self._attained_button.config(state="normal", bg=self._good_colour)
-                    else:
-                        self._task_error('exists')
+        if not task in ["Write your task here", ""] and not quantity in\
+           ["Write your quantity of the task here, or leave blank for no quantity"]:
+            if (not ',' in task and not ',' in quantity):
+                if user_tasks_len > 0:
+                    for i in range(user_tasks_len):
+                        real_task = self.current_user.return_user_tasks()[i].return_task()
+                        real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
+                        if (task != real_task or quantity != real_quantity):
+                            return True
+                        else:
+                            self._task_error('exists')
+                            return False
+                else:
+                    self._attained_button.config(state="normal", bg=self._good_colour)
+                    return False
             else:
-                self._attained_button.config(state="normal", bg=self._good_colour)
+                self._task_error('comma')
+                return False
         else:
-            self._task_error('comma')
-        
+            self._task_error('initial')
+            return False
         
         
         
@@ -319,17 +304,22 @@ class GUI:
         return True
 
     def _task_error(self, error):
-        self._error_label.config(fg="#ff0000")
-        self._attained_button.config(state="disabled", bg=self._bad_colour)
+#         self._error_label.config(fg="#ff0000")
+#         self._attained_button.config(state="disabled", bg=self._bad_colour)
         if error == 'comma':
-            self._error_label.config(text="No commas allowed in Task or "
-                                     "Quantity!")
+#             self._error_label.config(text="No commas allowed in Task or "
+#                                      "Quantity!")
+            tk.messagebox.showwarning("Action Failed", "No commas allowed in "
+                                      "Task or Quantity!")
         elif error == 'exists':
-            self._error_label.config(text="Task already exists!")
+#             self._error_label.config(text="Task already exists!")
+            tk.messagebox.showwarning("Action Failed", "Task already exists!")
         
         elif error == 'initial':
-            self._error_label.config(text="Can't make a task or quantity with "
-                                     "the inital text!")
+#             self._error_label.config(text="Can't make a task or quantity with "
+#                                      "the inital text!")
+            tk.messagebox.showwarning("Action Failed", "Can't make a task or "
+                                      "quantity with the inital text!")
     
     def _task_happy(self):
         self._error_label.config(fg="#f3F3f3")
