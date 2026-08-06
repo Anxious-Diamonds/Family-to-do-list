@@ -296,16 +296,25 @@ class GUI:
             self._complete_task_button.config(state="disabled", bg=self._bad_colour)
     
     def _check_user_tasks(self, task, quantity):
-        for i in range(len(self.current_user.return_user_tasks())):
-            real_task = self.current_user.return_user_tasks()[i].return_task()
-            real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
-            if (task != real_task or quantity != real_quantity):
-                if (not ',' in task and not ',' in quantity):
-                    self._attained_button.config(state="normal", bg=self._good_colour)
-                else:
-                    self._task_error('comma')
+        user_tasks_len = len(self.current_user.return_user_tasks())
+        if (not ',' in task and not ',' in quantity):
+            if user_tasks_len > 0:
+                for i in range(user_tasks_len):
+                    real_task = self.current_user.return_user_tasks()[i].return_task()
+                    real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
+                    if (task != real_task or quantity != real_quantity):
+                            self._attained_button.config(state="normal", bg=self._good_colour)
+                    else:
+                        self._task_error('exists')
             else:
-                self._task_error('exists')
+                self._attained_button.config(state="normal", bg=self._good_colour)
+        else:
+            self._task_error('comma')
+        
+        
+        
+        
+        
                 # what are the returns for help me
         return True
 
