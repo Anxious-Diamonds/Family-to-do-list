@@ -208,7 +208,8 @@ class GUI:
             else:
                 self._task_error('exists')
         else:
-            print('AGHGHH')
+            pass
+#             print('AGHGHH')
 
     
     def _edit(self):
