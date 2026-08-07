@@ -207,6 +207,8 @@ class GUI:
                 self._quantity_text.set("")
             else:
                 self._task_error('exists')
+        else:
+            print('AGHGHH')
 
     
     def _edit(self):
@@ -283,13 +285,14 @@ class GUI:
                         real_task = self.current_user.return_user_tasks()[i].return_task()
                         real_quantity = self.current_user.return_user_tasks()[i].return_quantity()
                         if (task != real_task or quantity != real_quantity):
+                            # if no comma, not initial, not an existing task
                             return True
                         else:
                             self._task_error('exists')
                             return False
                 else:
-                    self._attained_button.config(state="normal", bg=self._good_colour)
-                    return False
+                    # if no comma, not initial, and there are no tasks now
+                    return True
             else:
                 self._task_error('comma')
                 return False
@@ -300,7 +303,7 @@ class GUI:
         
         
         
-                # what are the returns for help me
+                # what are the returns for help me | ok now they work 7 8 2026
         return True
 
     def _task_error(self, error):
